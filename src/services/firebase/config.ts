@@ -10,7 +10,7 @@ type FirebaseConfig = {
 }
 
 export const firebaseConfig: FirebaseConfig = {
-  apiKey: "AIzaSyCwEnMkf9RLhscw14WgEHtoq_qrSKuvyFQ",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
   authDomain: "scholarskit-94dcc.firebaseapp.com",
   projectId: "scholarskit-94dcc",
   storageBucket: "scholarskit-94dcc.firebasestorage.app",
