@@ -90,8 +90,8 @@ const DocumentViewer = () => {
   };
 
   return (
-    <div className="flex-1 flex min-h-screen w-full">
-      <div className="flex-1 bg-white">
+    <div className="flex min-h-screen w-full">
+      <div className="bg-white w-full">
         <div className="border-b border-gray-200 p-4">
           <div className="flex items-center space-x-3">
             <FileText className="w-5 h-5 text-gray-600" />
@@ -99,7 +99,7 @@ const DocumentViewer = () => {
             <ArrowRight className="w-4 h-4 text-gray-400" />
           </div>
         </div>
-        <div className="p-8 w-full mx-auto">
+        <div className="w-full">
           <input
             type="file"
             accept="application/pdf"
@@ -107,7 +107,7 @@ const DocumentViewer = () => {
             ref={fileInputRef}
             onChange={handleFileChange}
           />
-          <div className='flex flex-col min-h-[60vh] items-center justify-center gap-4'>
+          <div className='flex flex-col w-full min-h-[60vh] items-center justify-center gap-4'>
             <h1 className="text-3xl font-bold text-gray-800 mb-6">
               {docUrl ? 'Your Document' : 'Get Started with ScholarsKit'}
             </h1>
@@ -121,7 +121,7 @@ const DocumentViewer = () => {
                 <iframe
                   ref={iframeRef}
                   src={docUrl}
-                  width="600"
+                  width="100%"
                   height="800"
                   style={{ border: '1px solid #ccc', borderRadius: '4px' }}
                   title="PDF Viewer"
