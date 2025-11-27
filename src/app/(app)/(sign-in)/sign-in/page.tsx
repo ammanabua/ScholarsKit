@@ -1,11 +1,14 @@
 'use client'
+import Link from "next/dist/client/link";
 import Image from "next/image";
 
 export default function SignInPage() {
   return (
     <div className="flex flex-col w-full min-h-screen items-center justify-center bg-gray-200">     
       <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-        <Image src="/logo-black.svg" alt="Logo" width={75} height={25} className="mx-auto mb-6" />
+        <Link href="/">
+          <Image src="/logo-black.svg" alt="Logo" width={75} height={25} className="mx-auto mb-6" />
+        </Link>
         <form className="max-w-sm">
           <h3 className="text-xl font-semibold mb-6 text-center text-slate-800">Sign In</h3>
           <div className="mb-4">
@@ -23,7 +26,7 @@ export default function SignInPage() {
           </p>
         </form>
         <div className="my-6 max-w-sm mx-4 border-t" />
-        <button className="bg-white w-full text-blue-500 cursor-pointer font-lg font-semibold py-2 border border-2 border-slate-300 rounded">Login with <span className="google-logo">
+        <button className="bg-white w-full text-blue-500 hover:text-white hover:bg-blue-500/60 hover:border-blue-500/60 cursor-pointer font-lg font-semibold py-2 border border-blue-600 rounded">Login with <span className="google-logo">
             <span className="text-[#4285F4]">G</span>
             <span className="text-[#EA4335]">o</span>
             <span className="text-[#FBBC05]">o</span>
