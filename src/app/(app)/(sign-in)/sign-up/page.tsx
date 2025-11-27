@@ -1,11 +1,14 @@
 'use client'
+import Link from "next/dist/client/link";
 import Image from "next/image";
 
 export default function SignUpPage() {
   return (
     <div className="flex flex-col w-full min-h-screen items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-        <Image src="/logo-black.svg" alt="Logo" width={75} height={25} className="mx-auto mb-6" />
+        <Link href="/">
+          <Image src="/logo-black.svg" alt="Logo" width={75} height={25} className="mx-auto mb-6" />
+        </Link>
         <form className="">
           <h2 className="text-2xl font-bold mb-6 text-center text-slate-800">Sign Up</h2>
           <div className="mb-4">
