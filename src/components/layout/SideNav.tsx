@@ -21,7 +21,7 @@ const SideNav = () => {
         <div className="w-64 bg-slate-800 text-white flex flex-col h-screen sticky top-0">
             {/* Logo */}
             <div className="p-6 border-b border-slate-700 m-auto flex flex-col items-center space-y-4">
-                <div className="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center">
+                <div className="w-16 h-16 rounded-lg flex items-center justify-center">
                     <Link href="/">
                         <Image src='/logo-white.svg' width={15} height={15} alt="scholars kit logo" className="w-15 h-15" />
                     </Link>

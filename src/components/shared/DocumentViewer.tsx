@@ -1,6 +1,8 @@
 'use client'
 import { ArrowRight, FileText, FolderPlus, PlusCircle } from 'lucide-react'
 import React, { useRef, useState } from 'react'
+import GeneralLoader from './GeneralLoader';
+import { toast } from 'react-toastify';
 
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL; // Replace with your actual endpoint
 
@@ -67,9 +69,9 @@ const DocumentViewer = () => {
         } else {
           console.warn('No url or url in response');
         }
-        alert('File uploaded successfully!');
+        toast.success('File uploaded successfully');
       } catch (error) {
-        console.error('Upload error:', error);
+        toast.error('Upload failed ' + (error instanceof Error ? error.message : 'Unknown error'));
         alert('Upload failed');
       } finally {
         setLoading(false);
@@ -90,7 +92,7 @@ const DocumentViewer = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex w-full max-h-screen overflow-y-scroll">
       <div className="bg-white w-full">
         <div className="border-b border-gray-200 p-4">
           <div className="flex items-center space-x-3">
@@ -112,9 +114,10 @@ const DocumentViewer = () => {
               {docUrl ? 'Your Document' : 'Get Started with ScholarsKit'}
             </h1>
             <div className='flex gap-4'>
-              <button onClick={handleUploadDocument} className='flex border border-yellow-600 p-4 rounded-lg text-gray-700 gap-2 cursor-pointer' disabled={loading}><PlusCircle />{loading ? 'Uploading...' : 'Upload Document'}</button>
+              <button onClick={handleUploadDocument} className='flex border border-yellow-600 p-4 rounded-lg text-gray-700 gap-2 cursor-pointer' disabled={loading}><PlusCircle />Upload</button>
               <button onClick={handleCreateCourse} className='flex border border-yellow-600 p-4 rounded-lg text-gray-700 gap-2 cursor-pointer'><FolderPlus />Create a Course</button>
             </div>
+            {loading && <GeneralLoader />}
             {docUrl && (
               <div className="mt-8 w-full flex flex-col items-center">
                 {pdfError && <p className="text-red-600 mb-4">Error loading PDF: {pdfError}</p>}
@@ -122,7 +125,7 @@ const DocumentViewer = () => {
                   ref={iframeRef}
                   src={docUrl}
                   width="100%"
-                  height="800"
+                  height="600"
                   style={{ border: '1px solid #ccc', borderRadius: '4px' }}
                   title="PDF Viewer"
                 />
