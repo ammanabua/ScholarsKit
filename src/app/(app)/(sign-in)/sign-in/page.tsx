@@ -1,5 +1,5 @@
 'use client'
-import Link from "next/dist/client/link";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function SignInPage() {
@@ -22,7 +22,7 @@ export default function SignInPage() {
           <span className="text-sm text-slate-800 flex justify-end mb-2">Forgot password? <a href="/forgot-password" className="text-blue-600 hover:underline ml-1">Click Here</a></span>
           <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">Sign In</button>
           <p className="mt-4 text-center text-sm text-slate-800">
-            Don&apos;t have an account? <a href="/sign-up" className="text-blue-600 hover:underline">Sign Up</a>
+            Don&apos;t have an account? <Link href="/sign-up" className="text-blue-600 hover:underline">Sign Up</Link>
           </p>
         </form>
         <div className="my-6 max-w-sm mx-4 border-t" />

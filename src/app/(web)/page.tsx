@@ -1,54 +1,180 @@
+'use client'
+import Image from "next/image";
+import Link from "next/link";
 
-export default function Page() {
+export default function LandingPage() {
+  const year = new Date().getFullYear();
+
   return (
-    <main className="min-h-screen w-full bg-gradient-to-br from-white to-blue-50 flex flex-col items-center justify-center font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 w-full">
       {/* Hero Section */}
-      <section className="w-full max-w-3xl px-6 py-16 text-center">
-        <h1 className="text-5xl font-extrabold text-slate-800 mb-4">ScholarsKit</h1>
-        <p className="text-xl text-blue-700 mb-8">Your AI-powered study companion for smarter, faster learning.</p>
-        <a
-          href="/sign-in"
-          className="inline-block bg-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:bg-blue-800 transition font-semibold text-lg"
+      <section className="relative overflow-hidden px-6 py-10 text-center">
+        <div 
+          className="mx-auto max-w-4xl"
+          style={{
+            animation: 'fadeInUp 0.8s ease-out 0.2s both'
+          }}
         >
-          Get Started Free
-        </a>
+          <div 
+            className="mb-6 inline-block"
+          >
+            <Image src="/logo-black.svg" alt="ScholarsKit Logo" width={80} height={80} />
+          </div>
+          
+          <h1 
+            className="mb-6 text-4xl font-bold text-gray-900 md:text-6xl"
+            style={{
+              animation: 'fadeInUp 0.8s ease-out 0.3s both'
+            }}
+          >
+            ScholarsKit
+          </h1>
+          
+          <p 
+            className="mb-8 text-xl text-gray-600 md:text-2xl"
+            style={{
+              animation: 'fadeInUp 0.8s ease-out 0.4s both'
+            }}
+          >
+            Your AI-powered study companion for smarter, faster learning, and research.
+          </p>
+          
+          <Link
+            href='/dashboard' 
+            className="rounded-full bg-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:bg-indigo-700 hover:shadow-xl hover:scale-105"
+            style={{
+              animation: 'fadeInUp 0.8s ease-out 0.5s both'
+            }}
+          >
+            Get Started Free
+          </Link>
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="w-full max-w-4xl px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center">
-          <svg className="w-10 h-10 text-blue-600 mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12V4"/></svg>
-          <h3 className="font-bold text-lg mb-2 text-slate-700">AI-Powered Q&A</h3>
-          <p className="text-gray-600">Get instant, accurate answers to your study questions, powered by advanced AI.</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center">
-          <svg className="w-10 h-10 text-blue-600 mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          <h3 className="font-bold text-lg mb-2 text-slate-700">Smart Summaries</h3>
-          <p className="text-gray-600">Summarize textbooks, notes, and articles in seconds for efficient revision.</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center">
-          <svg className="w-10 h-10 text-blue-600 mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <h3 className="font-bold text-lg mb-2 text-slate-700">Collaborative Workspace</h3>
-          <p className="text-gray-600">Study together, share notes, and chat with peers in a secure environment.</p>
+      <section className="px-6 py-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-8 md:grid-cols-3">
+            {/* Feature 1 */}
+            <div 
+              className="rounded-2xl bg-white p-8 shadow-lg transition-all hover:shadow-2xl hover:-translate-y-2"
+              style={{
+                animation: 'fadeInUp 0.8s ease-out 0.6s both'
+              }}
+            >
+              <div className="mb-4 text-5xl text-center">🤖</div>
+              <h3 className="mb-3 text-2xl font-bold text-gray-900 text-center">
+                AI-Powered Q&A
+              </h3>
+              <p className="text-gray-600">
+                Get instant, accurate answers to your study questions, powered by advanced AI.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div 
+              className="rounded-2xl bg-white p-8 shadow-lg transition-all hover:shadow-2xl hover:-translate-y-2"
+              style={{
+                animation: 'fadeInUp 0.8s ease-out 0.7s both'
+              }}
+            >
+              <div className="mb-4 text-5xl text-center">⚡</div>
+              <h3 className="mb-3 text-2xl font-bold text-gray-900 text-center">
+                Smart Summaries
+              </h3>
+              <p className="text-gray-600">
+                Summarize textbooks, notes, and articles in seconds for efficient revision.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div 
+              className="rounded-2xl bg-white p-8 shadow-lg transition-all hover:shadow-2xl hover:-translate-y-2"
+              style={{
+                animation: 'fadeInUp 0.8s ease-out 0.8s both'
+              }}
+            >
+              <div className="mb-4 text-5xl text-center">👥</div>
+              <h3 className="mb-3 text-2xl font-bold text-gray-900 text-center">
+                Collaborative Workspace
+              </h3>
+              <p className="text-gray-600">
+                Study together, share notes, and chat with peers in a secure environment.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Value Proposition Section */}
-      <section className="w-full max-w-2xl px-6 py-8 text-center">
-        <h2 className="text-2xl font-bold text-blue-800 mb-4">Why ScholarsKit?</h2>
-        <p className="text-gray-700 mb-6">Boost your productivity, deepen your understanding, and make learning enjoyable. ScholarsKit adapts to your needs, whether you&apos;re preparing for exams or exploring new topics.</p>
+      <section className="px-6 py-16">
+        <div 
+          className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 p-12 text-center text-white shadow-2xl"
+          style={{
+            animation: 'scaleIn 0.8s ease-out 0.9s both'
+          }}
+        >
+          <h2 className="mb-4 text-4xl font-bold">Why ScholarsKit?</h2>
+          <p className="text-lg opacity-90">
+            Boost your productivity, deepen your understanding, and make learning enjoyable. 
+            ScholarsKit adapts to your needs, whether you&apos;re preparing for exams or exploring new topics.
+          </p>
+        </div>
       </section>
 
       {/* Call to Action */}
-      <section className="w-full max-w-xl px-6 py-8 text-center">
-        <a
-          href="/sign-in"
-          className="inline-block bg-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:bg-blue-800 transition font-semibold text-lg"
+      <section className="px-6 py-20 text-center">
+        <div 
+          className="mx-auto max-w-2xl"
+          style={{
+            animation: 'fadeInUp 0.8s ease-out 1s both'
+          }}
         >
-          Start Your Free Trial
-        </a>
-        <p className="text-sm text-gray-500 mt-2">No credit card required</p>
+          <h2 className="mb-6 text-4xl font-bold text-gray-900">
+            Start Your Free Trial
+          </h2>
+          <Link href='/dashboard' className="rounded-full bg-indigo-600 px-10 py-5 text-xl font-semibold text-white shadow-lg transition-all hover:bg-indigo-700 hover:shadow-xl hover:scale-105">
+            Get Started Now
+          </Link>
+        </div>
       </section>
-    </main>
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(-10px);
+          }
+          50% {
+            transform: translateY(10px);
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
+
+      <footer className="w-full flex items-center justify-center text-slate-800 p-3 mt-8 text-lg">
+        <p>ScholarsKit<sup>&trade;</sup> {year}</p>
+      </footer>
+    </div>
   );
 }
