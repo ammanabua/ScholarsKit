@@ -11,7 +11,7 @@ export function useAuth(user?: User) {
     useEffect(() => {
         if (user === undefined) {
             // User is not logged in, redirect to login page
-            router.push('/login');
+            router.push('/sign-in');
         }
     }, [user, router])
 }
