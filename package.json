@@ -9,20 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.940.0",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
+    "formik": "^2.4.9",
     "framer-motion": "^12.23.24",
+    "iron-session": "^8.0.4",
     "lucide-react": "^0.523.0",
     "next": "15.3.2",
+    "openid-client": "^5.7.0",
     "pdfjs-dist": "^5.4.394",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-pdf": "^10.2.0",
-    "react-toastify": "^11.0.5"
+    "react-toastify": "^11.0.5",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/express": "^5.0.6",
+    "@types/express-session": "^1.18.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

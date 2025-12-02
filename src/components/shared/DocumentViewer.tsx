@@ -3,10 +3,13 @@ import { ArrowRight, FileText, FolderPlus, PlusCircle } from 'lucide-react'
 import React, { useRef, useState } from 'react'
 import GeneralLoader from './GeneralLoader';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/hooks/useAuth';
+import { User } from '@/lib/session';
 
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL; // Replace with your actual endpoint
 
-const DocumentViewer = () => {
+const DocumentViewer = ({ user }: { user?: User }) => {
+  useAuth(user);
   const [docUrl, setDocUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
@@ -97,7 +100,7 @@ const DocumentViewer = () => {
         <div className="border-b border-gray-200 p-4">
           <div className="flex items-center space-x-3">
             <FileText className="w-5 h-5 text-gray-600" />
-            <span className="text-gray-800 font-medium">Document Viewer</span>
+            <span className="text-gray-800 font-medium">Welcome {user?.name}</span>
             <ArrowRight className="w-4 h-4 text-gray-400" />
           </div>
         </div>
