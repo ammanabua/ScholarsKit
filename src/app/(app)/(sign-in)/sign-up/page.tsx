@@ -44,8 +44,8 @@ export default function SignUpPage() {
         }
 
         router.push('/sign-in?registered=true');
-      } catch (err: any) {
-        setFieldError('email', err.message); // Show API error as a form error
+      } catch (error) {
+        setFieldError('email', error instanceof Error ? error.message : 'An error occurred'); // Show API error as a form error
       } finally {
         setSubmitting(false);
       }
