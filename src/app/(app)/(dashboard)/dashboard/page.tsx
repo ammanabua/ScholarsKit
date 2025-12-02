@@ -1,11 +1,10 @@
 'use client'
 import AiChat from '@/components/shared/AiChat'
 import DocumentViewer from '@/components/shared/DocumentViewer'
-import { useAuth } from '@/hooks/useAuth'
-import { User } from '@/lib/session'
 
-const DashboardPage = ({ user }: { user?: User }) => {
-  useAuth(user)
+
+const page = () => {
+  
   
   return (
     <div className="flex w-full min-h-screen bg-gray-50">
@@ -17,4 +16,4 @@ const DashboardPage = ({ user }: { user?: User }) => {
   )
 }
 
-export default DashboardPage
+export default page
