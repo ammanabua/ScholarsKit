@@ -26,8 +26,9 @@ export async function POST(request: Request) {
     const command = new SignUpCommand(params)
     await cognitoClient.send(command)
     return NextResponse.json({ message: 'User registered successfully. Please check your email to confirm your account.' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Cognito SignUp error:', error)
-    return NextResponse.json({ error: error.name || 'An error occurred during registration' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.name : 'An error occurred during registration'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
