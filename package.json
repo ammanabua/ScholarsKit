@@ -11,7 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.940.0",
     "axios": "^1.9.0",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "formik": "^2.4.9",
     "framer-motion": "^12.23.24",
     "iron-session": "^8.0.4",

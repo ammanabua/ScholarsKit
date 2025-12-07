@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { CognitoIdentityProviderClient, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider'
+import crypto from 'crypto'
 
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.NEXT_PUBLIC_AWS_REGION })
 
@@ -10,8 +11,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
   }
 
+  const clientId = process.env.COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!
+  const clientSecret = process.env.COGNITO_CLIENT_SECRET || process.env.NEXT_PUBLIC_COGNITO_CLIENT_SECRET
+
+  const SecretHash = clientSecret
+    ? crypto.createHmac('sha256', clientSecret).update(email + clientId).digest('base64')
+    : undefined
+
   const params = {
-    ClientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    ClientId: clientId,
     Username: email,
     Password: password,
     UserAttributes: [
@@ -20,6 +28,7 @@ export async function POST(request: Request) {
         Value: email,
       },
     ],
+    ...(SecretHash ? { SecretHash } : {}),
   }
 
   try {
