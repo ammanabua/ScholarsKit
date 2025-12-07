@@ -26,14 +26,12 @@ export default function SignInPage() {
           </p>
         </form>
         <div className="my-6 max-w-sm mx-4 border-t" />
-        <button className="bg-white w-full text-blue-500 hover:text-white hover:bg-blue-500/60 hover:border-blue-500/60 cursor-pointer font-lg font-semibold py-2 border border-blue-600 rounded">Login with <span className="google-logo">
-            <span className="text-[#4285F4]">G</span>
-            <span className="text-[#EA4335]">o</span>
-            <span className="text-[#FBBC05]">o</span>
-            <span className="text-[#4285F4]">g</span>
-            <span className="text-[#34A853]">l</span>
-            <span className="text-[#EA4335]">e</span>
-          </span></button>
+        <Link
+          href="/api/auth/login"
+          className="block text-center bg-white w-full text-blue-600 hover:text-white hover:bg-blue-600/90 cursor-pointer font-semibold py-2 border border-blue-600 rounded"
+        >
+          Continue with AWS Cognito
+        </Link>
       </div>
     </div>
   );
