@@ -33,6 +33,8 @@ export async function GET(request: Request) {
 
     const userInfo = await client.userinfo(tokenSet.access_token)
 
+    // Persist access token for authenticated API calls
+    session.accessToken = tokenSet.access_token as string
     session.user = {
       id: userInfo.sub as string,
       username:

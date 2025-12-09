@@ -2,16 +2,10 @@ import { NextResponse } from 'next/server'
 import { CognitoIdentityProviderClient, InitiateAuthCommand, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider'
 import { getIronSession } from 'iron-session'
 import { cookies } from 'next/headers'
-import { sessionOptions } from '@/lib/session'
+import { sessionOptions, SessionData } from '@/lib/session'
 import crypto from 'crypto'
 
-export interface SessionData {
-  user?: {
-    id: string
-    username: string
-    email: string
-  }
-}
+// Use shared SessionData from lib/session
 
 const region = process.env.NEXT_PUBLIC_AWS_REGION
 const cognitoClient = new CognitoIdentityProviderClient({ region })
@@ -51,6 +45,7 @@ export async function POST(request: Request) {
 
     const cookieStore = await cookies()
     const session = await getIronSession<SessionData>(cookieStore, sessionOptions)
+    session.accessToken = tokens.AccessToken
     session.user = {
       id: attrs.sub || '',
       username: attrs.email || attrs.preferred_username || attrs.sub || email,

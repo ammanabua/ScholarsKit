@@ -12,6 +12,12 @@ export interface SessionData {
     user?: User;
     nonce?: string;
     state?: string;
+    accessToken?: string;
+    preferences?: {
+        theme?: string;
+        notifyProduct?: boolean;
+        notifySecurity?: boolean;
+    };
 }
 
 export const sessionOptions = {
