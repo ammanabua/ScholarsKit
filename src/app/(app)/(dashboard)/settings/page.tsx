@@ -24,15 +24,31 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
 
-  // Load basic defaults for demo; in a real app fetch from your API
+  // Initialize from API + local theme fallback
   useEffect(() => {
-    try {
-      const storedTheme = (localStorage.getItem("theme") as Theme) || "system"
-      setTheme(storedTheme)
-      // Example placeholders
-      setFullName("Jane Scholar")
-      setEmail("jane@example.com")
-    } catch {}
+    (async () => {
+      try {
+        const storedTheme = (localStorage.getItem('theme') as Theme) || 'system'
+        setTheme(storedTheme)
+
+        const res = await fetch('/api/user/me')
+        if (res.ok) {
+          const data = await res.json()
+          if (data?.user) {
+            setEmail(data.user.email || '')
+            // Prefer previously saved fullName if present
+            setFullName((data.user.name as string) || '')
+          }
+          if (data?.preferences) {
+            if (data.preferences.theme) setTheme(data.preferences.theme as Theme)
+            if (typeof data.preferences.notifyProduct === 'boolean') setNotifyProduct(Boolean(data.preferences.notifyProduct))
+            if (typeof data.preferences.notifySecurity === 'boolean') setNotifySecurity(Boolean(data.preferences.notifySecurity))
+          }
+        }
+      } catch {
+        // Non-blocking init errors
+      }
+    })()
   }, [])
 
   useEffect(() => {

@@ -27,7 +27,7 @@ export async function GET() {
 
   const authorizationUrl = client.authorizationUrl({
     redirect_uri: redirectUri,
-    scope: 'openid email profile',
+    scope: 'email openid phone',
     state,
     nonce,
   })
