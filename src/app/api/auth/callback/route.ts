@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     delete session.nonce
     await session.save()
 
-    const after = url.searchParams.get('redirect') || '/dashboard'
+    const after = url.searchParams.get('redirect') || '/dashboard?login=success'
     return NextResponse.redirect(new URL(after, url.origin))
   } catch (err) {
     console.error('Auth callback error:', err)
