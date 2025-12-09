@@ -7,7 +7,7 @@ import crypto from 'crypto'
 
 // Use shared SessionData from lib/session
 
-const region = process.env.NEXT_PUBLIC_AWS_REGION
+const region = 'us-east-1'
 const cognitoClient = new CognitoIdentityProviderClient({ region })
 
 export async function POST(request: Request) {

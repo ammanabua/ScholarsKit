@@ -4,7 +4,7 @@ import { getIronSession } from 'iron-session'
 import { sessionOptions, SessionData } from '@/lib/session'
 import { CognitoIdentityProviderClient, ChangePasswordCommand } from '@aws-sdk/client-cognito-identity-provider'
 
-const region = process.env.NEXT_PUBLIC_AWS_REGION
+const region = 'us-east-1'
 const cognitoClient = new CognitoIdentityProviderClient({ region })
 
 export async function POST(request: Request) {

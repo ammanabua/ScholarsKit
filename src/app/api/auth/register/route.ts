@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { CognitoIdentityProviderClient, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider'
 import crypto from 'crypto'
 
-const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.NEXT_PUBLIC_AWS_REGION })
+const cognitoClient = new CognitoIdentityProviderClient({ region: 'us-east-1' })
 
 export async function POST(request: Request) {
   const { email, password } = await request.json()
