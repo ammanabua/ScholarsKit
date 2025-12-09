@@ -31,4 +31,4 @@ const DashboardPage = ({ user }: { user?: User }) => {
   )
 }
 
-export default DashboardPage
+export default page
