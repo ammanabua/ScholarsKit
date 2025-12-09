@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       {
         Name: 'email',
         Value: email,
+        password: password,
       },
     ],
     ...(SecretHash ? { SecretHash } : {}),

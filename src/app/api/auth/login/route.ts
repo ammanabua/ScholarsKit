@@ -22,8 +22,12 @@ export async function GET() {
   session.nonce = nonce
   await session.save()
 
+  // Use explicit redirect_uri to match Cognito App Client configuration
+  const redirectUri = process.env.COGNITO_REDIRECT_URI || `${process.env.NEXT_PUBLIC_AMPLIFY_APP_URL ?? 'http://localhost:3000/'}api/auth/callback`
+
   const authorizationUrl = client.authorizationUrl({
-    scope: 'openid email profile',
+    redirect_uri: redirectUri,
+    scope: 'email openid phone',
     state,
     nonce,
   })
