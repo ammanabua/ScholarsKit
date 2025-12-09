@@ -2,13 +2,12 @@
 import AiChat from '@/components/shared/AiChat'
 import DocumentViewer from '@/components/shared/DocumentViewer'
 import { useAuth } from '@/hooks/useAuth'
-import { User } from '@/lib/session'
 import { useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 
-const DashboardPage = ({ user }: { user?: User }) => {
-  useAuth(user)
+const DashboardPage = () => {
+  useAuth()
   const searchParams = useSearchParams()
   const router = useRouter()
 
