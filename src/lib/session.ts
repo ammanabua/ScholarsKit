@@ -22,7 +22,7 @@ export interface SessionData {
 
 export const sessionOptions = {
     cookieName: "app_session",
-    password: process.env.SESSION_PASSWORD!,
+    password: process.env.NEXT_PUBLIC_SESSION_PASSWORD!,
     // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
     cookieOptions: {
         secure: process.env.NODE_ENV === "production",

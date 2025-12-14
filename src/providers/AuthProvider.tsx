@@ -10,6 +10,8 @@ interface AuthProviderProps {
   requireAuth?: boolean
 }
 
+
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
   const pathname = usePathname()

@@ -6,34 +6,36 @@ export async function getCognitoClient() {
   if (cognitoClient) return cognitoClient;
 
   try {
-    const issuerUrl = process.env.COGNITO_ISSUER_URL || process.env.NEXT_PUBLIC_COGNITO_ISSUER_URL;
+    let issuerUrl = process.env.NEXT_PUBLIC_COGNITO_ISSUER_URL;
     if (!issuerUrl) {
       throw new Error('Missing COGNITO_ISSUER_URL (or NEXT_PUBLIC_COGNITO_ISSUER_URL).');
     }
+    // Normalize issuer URL: remove trailing slashes
+    issuerUrl = issuerUrl.replace(/\/$/, '');
 
     const CognitoIssuer = await Issuer.discover(issuerUrl);
 
-    const clientId = process.env.COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const clientSecret = process.env.COGNITO_CLIENT_SECRET || process.env.NEXT_PUBLIC_COGNITO_CLIENT_SECRET;
+    const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+    const clientSecret = process.env.NEXT_PUBLIC_COGNITO_CLIENT_SECRET;
     if (!clientId) {
       throw new Error('Missing COGNITO_CLIENT_ID (or NEXT_PUBLIC_COGNITO_CLIENT_ID).');
     }
 
-    const redirectUri = process.env.COGNITO_REDIRECT_URI || `${process.env.NEXT_PUBLIC_AMPLIFY_APP_URL ?? 'http://localhost:3000/'}api/auth/callback`;
+    // Prefer explicit redirect URI; fallback to localhost for dev
+    const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI || 'http://localhost:3000/api/auth/callback';
 
+    // Configure client; if clientSecret provided, rely on default confidential auth method
     cognitoClient = new CognitoIssuer.Client({
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uris: [
-        // Prefer explicit server var, else fall back to Amplify URL, else localhost
-        redirectUri,
-      ],
+      redirect_uris: [redirectUri],
       response_types: ['code'],
     });
 
     return cognitoClient;
   } catch (error) {
-    console.error('Failed to initialize Cognito client:', error);
+    console.error('Failed to initialize Cognito client:')
+    console.log(error);
     throw error;
   }
 }
