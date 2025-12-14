@@ -23,8 +23,8 @@ export async function GET(request: Request) {
     await session.save()
 
     // Build redirect_uri from the current request origin to avoid env mismatches
-    const origin = new URL(request.url).origin
-    const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI || `${origin}/api/auth/callback`
+    // const origin = new URL(request.url).origin
+    const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI
 
     const authorizationUrl = client.authorizationUrl({
       redirect_uri: redirectUri,
