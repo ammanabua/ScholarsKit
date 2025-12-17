@@ -15,7 +15,10 @@ export async function GET(request: Request) {
     const params = client.callbackParams(request.url)
 
     // Use current origin to avoid env mismatches
-    const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI
+    const redirectUri =
+      process.env.COGNITO_REDIRECT_URI ||
+      process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI ||
+      `${url.origin}/api/auth/callback`
 
     if (!session.state || !session.nonce) {
       // Missing OAuth state/nonce -> restart login flow
