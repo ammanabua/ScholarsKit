@@ -8,6 +8,14 @@ applications:
             - npm ci
         build:
           commands:
+            # Write environment variables to .env.production for Next.js runtime
+            - echo "SESSION_PASSWORD=$SESSION_PASSWORD" >> .env.production
+            - echo "COGNITO_ISSUER_URL=$COGNITO_ISSUER_URL" >> .env.production
+            - echo "COGNITO_CLIENT_ID=$COGNITO_CLIENT_ID" >> .env.production
+            - echo "COGNITO_CLIENT_SECRET=$COGNITO_CLIENT_SECRET" >> .env.production
+            - echo "COGNITO_REDIRECT_URI=$COGNITO_REDIRECT_URI" >> .env.production
+            - echo "COGNITO_HOSTED_UI_DOMAIN=$COGNITO_HOSTED_UI_DOMAIN" >> .env.production
+            - echo "COGNITO_LOGOUT_REDIRECT_URI=$COGNITO_LOGOUT_REDIRECT_URI" >> .env.production
             - npm run build
       artifacts:
         baseDirectory: .next
