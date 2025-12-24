@@ -44,8 +44,8 @@ export async function GET(request: Request) {
   }
 
   // For production, redirect to Cognito hosted UI logout if configured
-  const clientId = process.env.COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID
-  const hostedDomain = process.env.COGNITO_HOSTED_UI_DOMAIN || process.env.NEXT_PUBLIC_COGNITO_HOSTED_UI_DOMAIN
+  const clientId = process.env.COGNITO_CLIENT_ID
+  const hostedDomain = process.env.COGNITO_HOSTED_UI_DOMAIN
   const postLogout = process.env.COGNITO_LOGOUT_REDIRECT_URI || `${origin}/`
 
   if (clientId && hostedDomain) {
