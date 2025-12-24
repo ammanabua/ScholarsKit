@@ -13,15 +13,24 @@ interface SessionData {
 function getPublicOrigin(request: Request): string {
   const headers = new Headers(request.headers)
   const forwardedHost = headers.get('x-forwarded-host')
-  const forwardedProto = headers.get('x-forwarded-proto') || 'https'
+  const forwardedProto = headers.get('x-forwarded-proto')
   const host = headers.get('host')
 
+  // Behind a proxy (like Amplify), use forwarded headers
   if (forwardedHost) {
-    return `${forwardedProto}://${forwardedHost}`
+    return `${forwardedProto || 'https'}://${forwardedHost}`
   }
-  if (host && !host.includes('localhost')) {
-    return `${forwardedProto}://${host}`
+  
+  // For localhost development, use http
+  if (host?.includes('localhost')) {
+    return `http://${host}`
   }
+  
+  // For other hosts (direct access), use the host header with https
+  if (host) {
+    return `https://${host}`
+  }
+  
   return new URL(request.url).origin
 }
 
@@ -43,6 +52,9 @@ export async function GET(request: Request) {
     const redirectUri = process.env.COGNITO_REDIRECT_URI ||
       `${origin}/api/auth/callback`
 
+    console.log('Login - Using redirect URI:', redirectUri)
+    console.log('Login - Origin detected:', origin)
+
     const authorizationUrl = client.authorizationUrl({
       redirect_uri: redirectUri,
       scope: 'openid email profile',
@@ -50,12 +62,15 @@ export async function GET(request: Request) {
       nonce,
     })
 
+    console.log('Login - Authorization URL:', authorizationUrl)
+
     return NextResponse.redirect(authorizationUrl)
   } catch (err) {
-    console.log('Auth login error:', (err as Error)?.message)
+    console.error('Auth login error:', err)
     // Surface a readable error and guidance
     return NextResponse.json({
       error: 'Failed to initialize Cognito login',
+      message: (err as Error)?.message,
       hint: 'Check COGNITO_ISSUER_URL, COGNITO_CLIENT_ID/SECRET, and Callback URLs',
     }, { status: 500 })
   }
