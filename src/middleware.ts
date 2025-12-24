@@ -1,13 +1,39 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getIronSession } from 'iron-session'
-import { sessionOptions, SessionData } from '@/lib/session'
+import { unsealData } from 'iron-session'
 
 // Routes that require authentication
 const protectedRoutes = ['/dashboard', '/courses', '/files', '/settings']
 
 // Routes that should redirect to dashboard if already authenticated
 const authRoutes = ['/sign-in', '/sign-up']
+
+const COOKIE_NAME = 'app_session'
+
+async function getSessionFromCookie(request: NextRequest) {
+  const cookie = request.cookies.get(COOKIE_NAME)
+  
+  if (!cookie?.value) {
+    return null
+  }
+
+  try {
+    const password = process.env.SESSION_PASSWORD
+    if (!password) {
+      console.error('SESSION_PASSWORD is not set')
+      return null
+    }
+
+    const session = await unsealData<{ user?: { id: string; email: string } }>(cookie.value, {
+      password,
+    })
+    
+    return session
+  } catch (error) {
+    console.error('Failed to unseal session:', error)
+    return null
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -22,10 +48,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Get session from cookie
-  const response = NextResponse.next()
-  const session = await getIronSession<SessionData>(request, response, sessionOptions)
-  
-  const isAuthenticated = !!session.user
+  const session = await getSessionFromCookie(request)
+  const isAuthenticated = !!session?.user
 
   // Redirect unauthenticated users away from protected routes
   if (isProtectedRoute && !isAuthenticated) {
@@ -39,7 +63,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {

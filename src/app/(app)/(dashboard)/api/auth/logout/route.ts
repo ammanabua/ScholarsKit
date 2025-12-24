@@ -40,7 +40,7 @@ export async function GET(request: Request) {
   
   // For localhost, just redirect to sign-in (skip Cognito logout)
   if (isLocalhost) {
-    return NextResponse.redirect(new URL('/sign-in', origin))
+    return NextResponse.redirect(new URL('/', origin))
   }
 
   // For production, redirect to Cognito hosted UI logout if configured
