@@ -2,13 +2,12 @@
 import { BookOpen, FileText, Home, Plus, Settings, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { toast } from 'react-toastify'
 
 
 const SideNav = () => {
     const pathname = usePathname();
-    const router = useRouter();
 
     const navItems = [
     { link: '/dashboard', label: 'Home', icon: Home },
@@ -54,25 +53,19 @@ const SideNav = () => {
             </nav>
 
             {/* Bottom Section */}
-                        <div className="p-4 border-t border-slate-700">
-                                <button
-                                    onClick={async () => {
-                                        try {
-                                            const res = await fetch('/api/auth/logout')
-                                            if (!res.ok) throw new Error('Logout failed')
-                                            toast.success('Signed out successfully')
-                                            router.replace('/sign-in')
-                                        } catch (err) {
-                                            const msg = err instanceof Error ? err.message : 'Logout failed'
-                                            toast.error(msg)
-                                        }
-                                    }}
-                                    className="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors"
-                                >
-                                        <User className="w-5 h-5" />
-                                        <span>Log out</span>
-                                </button>
-                        </div>
+            <div className="p-4 border-t border-slate-700">
+                <button
+                    onClick={() => {
+                        // Use direct navigation for logout (not fetch) to avoid CORS issues
+                        window.location.href = '/api/auth/logout'
+                        toast.info('Logging out...')
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors"
+                >
+                    <User className="w-5 h-5" />
+                    <span>Log out</span>
+                </button>
+            </div>
         </div>
     </div>
   )

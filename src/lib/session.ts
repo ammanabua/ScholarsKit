@@ -24,11 +24,13 @@ export interface SessionData {
 export const sessionOptions = {
     cookieName: "app_session",
     // Use server-only env var - never expose session password to client
-    password: process.env.SESSION_PASSWORD || process.env.NEXT_PUBLIC_SESSION_PASSWORD!,
+    password: process.env.SESSION_PASSWORD!,
     cookieOptions: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         sameSite: 'lax' as const,
+        // Cookie expires in 7 days (in seconds)
+        maxAge: 60 * 60 * 24 * 7,
     },
 }
 

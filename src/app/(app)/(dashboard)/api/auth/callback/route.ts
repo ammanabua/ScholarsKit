@@ -8,15 +8,24 @@ import { sessionOptions, SessionData } from '@/lib/session'
 function getPublicOrigin(request: Request): string {
   const headers = new Headers(request.headers)
   const forwardedHost = headers.get('x-forwarded-host')
-  const forwardedProto = headers.get('x-forwarded-proto') || 'https'
+  const forwardedProto = headers.get('x-forwarded-proto')
   const host = headers.get('host')
 
+  // Behind a proxy (like Amplify), use forwarded headers
   if (forwardedHost) {
-    return `${forwardedProto}://${forwardedHost}`
+    return `${forwardedProto || 'https'}://${forwardedHost}`
   }
-  if (host && !host.includes('localhost')) {
-    return `${forwardedProto}://${host}`
+  
+  // For localhost development, use http
+  if (host?.includes('localhost')) {
+    return `http://${host}`
   }
+  
+  // For other hosts (direct access), use the host header with https
+  if (host) {
+    return `https://${host}`
+  }
+  
   return new URL(request.url).origin
 }
 
@@ -31,10 +40,12 @@ export async function GET(request: Request) {
     const origin = getPublicOrigin(request)
     const params = client.callbackParams(request.url)
 
-    // Use public origin to handle proxy environments
-    const redirectUri =
-      process.env.COGNITO_REDIRECT_URI ||
-      `${origin}/api/auth/callback`
+    // For local development, always use the detected origin
+    // For production, use COGNITO_REDIRECT_URI if set
+    const isLocalhost = origin.includes('localhost')
+    const redirectUri = isLocalhost 
+      ? `${origin}/api/auth/callback`
+      : (process.env.COGNITO_REDIRECT_URI || `${origin}/api/auth/callback`)
 
     if (!session.state || !session.nonce) {
       // Missing OAuth state/nonce -> restart login flow
@@ -52,11 +63,9 @@ export async function GET(request: Request) {
 
     const userInfo = await client.userinfo(tokenSet.access_token)
 
-    // Persist tokens for authenticated API calls
-    session.accessToken = tokenSet.access_token as string
-    if (tokenSet.refresh_token) {
-      session.refreshToken = tokenSet.refresh_token as string
-    }
+    // Store minimal session data to avoid cookie size limits
+    // Note: Access tokens are large JWTs, so we don't store them in the cookie
+    // If you need to make authenticated API calls to Cognito, consider using a database/Redis for token storage
     session.user = {
       id: userInfo.sub as string,
       username:
@@ -67,6 +76,8 @@ export async function GET(request: Request) {
     }
     delete session.state
     delete session.nonce
+    delete session.accessToken  // Don't store large tokens in cookie
+    delete session.refreshToken
     await session.save()
 
     const after = url.searchParams.get('redirect') || '/dashboard?login=success'

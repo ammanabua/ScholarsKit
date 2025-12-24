@@ -1,0 +1,56 @@
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { getIronSession } from 'iron-session'
+import { sessionOptions, SessionData } from '@/lib/session'
+
+// Routes that require authentication
+const protectedRoutes = ['/dashboard', '/courses', '/files', '/settings']
+
+// Routes that should redirect to dashboard if already authenticated
+const authRoutes = ['/sign-in', '/sign-up']
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  
+  // Check if this is a protected route
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+  
+  // Skip middleware for non-protected, non-auth routes
+  if (!isProtectedRoute && !isAuthRoute) {
+    return NextResponse.next()
+  }
+
+  // Get session from cookie
+  const response = NextResponse.next()
+  const session = await getIronSession<SessionData>(request, response, sessionOptions)
+  
+  const isAuthenticated = !!session.user
+
+  // Redirect unauthenticated users away from protected routes
+  if (isProtectedRoute && !isAuthenticated) {
+    const signInUrl = new URL('/sign-in', request.url)
+    signInUrl.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(signInUrl)
+  }
+
+  // Redirect authenticated users away from auth routes
+  if (isAuthRoute && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  return response
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - api routes (they handle their own auth)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, public files
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)',
+  ],
+}

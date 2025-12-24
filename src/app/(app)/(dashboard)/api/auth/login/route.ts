@@ -49,15 +49,21 @@ export async function GET(request: Request) {
 
     // Build redirect_uri from the public origin to handle proxy environments
     const origin = getPublicOrigin(request)
-    const redirectUri = process.env.COGNITO_REDIRECT_URI ||
-      `${origin}/api/auth/callback`
+    
+    // For local development, always use the detected origin
+    // For production, use COGNITO_REDIRECT_URI if set
+    const isLocalhost = origin.includes('localhost')
+    const redirectUri = isLocalhost 
+      ? `${origin}/api/auth/callback`
+      : (process.env.COGNITO_REDIRECT_URI || `${origin}/api/auth/callback`)
 
     console.log('Login - Using redirect URI:', redirectUri)
     console.log('Login - Origin detected:', origin)
+    console.log('Login - Is localhost:', isLocalhost)
 
     const authorizationUrl = client.authorizationUrl({
       redirect_uri: redirectUri,
-      scope: 'openid email profile',
+      scope: 'openid email',  // Make sure these scopes are enabled in Cognito App Client
       state,
       nonce,
     })

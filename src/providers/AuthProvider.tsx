@@ -1,57 +1,57 @@
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@/lib/session'
-import GeneralLoader from '@/components/shared/GeneralLoader'
+
+interface AuthContextType {
+  user: User | null
+  isLoading: boolean
+  refreshUser: () => Promise<void>
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isLoading: true,
+  refreshUser: async () => {},
+})
+
+export function useAuth() {
+  return useContext(AuthContext)
+}
 
 interface AuthProviderProps {
   children: ReactNode
-  requireAuth?: boolean
 }
 
-
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const router = useRouter()
-  const pathname = usePathname()
+  const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState<User | undefined>(undefined)
 
-  const protectedRoutes = ['/dashboard', '/courses', '/files', '/settings']
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  const refreshUser = async () => {
+    try {
+      const response = await fetch('/api/auth/session', {
+        credentials: 'include',
+        cache: 'no-store',
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user || null)
+      }
+    } catch (error) {
+      console.error('Failed to fetch session:', error)
+      setUser(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const response = await fetch('/api/auth/session')
-        if (response.ok) {
-          const data = await response.json()
-          setUser(data.user)
-        }
-      } catch (error) {
-        console.error('Failed to fetch session:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchSession()
+    refreshUser()
   }, [])
 
-  useEffect(() => {
-    if (!isLoading && isProtectedRoute && !user) {
-      router.push('/sign-in')
-    }
-  }, [isLoading, isProtectedRoute, user, router])
-
-  if (isLoading) {
-    return <GeneralLoader />
-  }
-
-  if (isProtectedRoute && !user) {
-    return <GeneralLoader />
-  }
-
-  return <>{children}</>
+  return (
+    <AuthContext.Provider value={{ user, isLoading, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
