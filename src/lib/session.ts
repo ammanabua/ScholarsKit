@@ -13,6 +13,7 @@ export interface SessionData {
     nonce?: string;
     state?: string;
     accessToken?: string;
+    refreshToken?: string;
     preferences?: {
         theme?: string;
         notifyProduct?: boolean;
@@ -22,10 +23,12 @@ export interface SessionData {
 
 export const sessionOptions = {
     cookieName: "app_session",
-    password: process.env.NEXT_PUBLIC_SESSION_PASSWORD!,
-    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
+    // Use server-only env var - never expose session password to client
+    password: process.env.SESSION_PASSWORD || process.env.NEXT_PUBLIC_SESSION_PASSWORD!,
     cookieOptions: {
         secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        sameSite: 'lax' as const,
     },
 }
 

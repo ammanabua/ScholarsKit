@@ -6,7 +6,7 @@ export async function getCognitoClient() {
   if (cognitoClient) return cognitoClient;
 
   try {
-    let issuerUrl = process.env.NEXT_PUBLIC_COGNITO_ISSUER_URL;
+    let issuerUrl = process.env.COGNITO_ISSUER_URL;
     if (!issuerUrl) {
       throw new Error('Missing COGNITO_ISSUER_URL (or NEXT_PUBLIC_COGNITO_ISSUER_URL).');
     }
@@ -15,14 +15,14 @@ export async function getCognitoClient() {
 
     const CognitoIssuer = await Issuer.discover(issuerUrl);
 
-    const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const clientSecret = process.env.NEXT_PUBLIC_COGNITO_CLIENT_SECRET;
+    const clientId = process.env.COGNITO_CLIENT_ID;
+    const clientSecret = process.env.COGNITO_CLIENT_SECRET;
     if (!clientId) {
       throw new Error('Missing COGNITO_CLIENT_ID (or NEXT_PUBLIC_COGNITO_CLIENT_ID).');
     }
 
     // Prefer explicit redirect URI; fallback to localhost for dev
-    const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI || 'http://localhost:3000/api/auth/callback';
+    const redirectUri = process.env.COGNITO_REDIRECT_URI || 'http://localhost:3000/api/auth/callback';
 
     // Configure client; if clientSecret provided, rely on default confidential auth method
     cognitoClient = new CognitoIssuer.Client({

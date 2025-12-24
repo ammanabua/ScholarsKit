@@ -9,6 +9,22 @@ interface SessionData {
   state?: string
   nonce?: string
 }
+// Helper to get the public origin behind proxies (e.g., AWS Amplify)
+function getPublicOrigin(request: Request): string {
+  const headers = new Headers(request.headers)
+  const forwardedHost = headers.get('x-forwarded-host')
+  const forwardedProto = headers.get('x-forwarded-proto') || 'https'
+  const host = headers.get('host')
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`
+  }
+  if (host && !host.includes('localhost')) {
+    return `${forwardedProto}://${host}`
+  }
+  return new URL(request.url).origin
+}
+
 export async function GET(request: Request) {
   try {
     const client = await getCognitoClient()
@@ -22,11 +38,9 @@ export async function GET(request: Request) {
     session.nonce = nonce
     await session.save()
 
-    // Build redirect_uri from the current request origin to avoid env mismatches
-    const origin = new URL(request.url).origin
-    const redirectUri =
-      process.env.COGNITO_REDIRECT_URI ||
-      process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI ||
+    // Build redirect_uri from the public origin to handle proxy environments
+    const origin = getPublicOrigin(request)
+    const redirectUri = process.env.COGNITO_REDIRECT_URI ||
       `${origin}/api/auth/callback`
 
     const authorizationUrl = client.authorizationUrl({
