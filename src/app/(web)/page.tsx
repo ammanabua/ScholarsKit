@@ -109,7 +109,7 @@ export default function LandingPage() {
       {/* Value Proposition Section */}
       <section className="px-6 py-16">
         <div 
-          className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 p-12 text-center text-white shadow-2xl"
+          className="mx-auto max-w-4xl rounded-3xl bg-indigo-600 p-12 text-center text-white shadow-2xl"
           style={{
             animation: 'scaleIn 0.8s ease-out 0.9s both'
           }}
