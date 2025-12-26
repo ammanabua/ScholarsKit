@@ -1,5 +1,5 @@
 'use client'
-import { BookOpen, FileText, Home, Plus, Settings, User } from 'lucide-react'
+import { ChevronDown, BookOpen, FileText, Users, Home, Settings, LogOut } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -13,6 +13,7 @@ const SideNav = () => {
     { link: '/dashboard', label: 'Home', icon: Home },
     { link: '/files', label: 'Files', icon: FileText, hasSubmenu: true },
     { link: '/courses', label: 'Courses', icon: BookOpen, hasSubmenu: true },
+    { link: '/groups', label: 'Groups', icon: Users, hasSubmenu: true },
     { link: '/settings', label: 'Settings', icon: Settings }
   ];
 
@@ -46,7 +47,7 @@ const SideNav = () => {
                                 <item.icon className="w-5 h-5" />
                                 <span>{item.label}</span>
                             </div>
-                            {item.hasSubmenu && <Plus className="w-4 h-4" />}
+                            {item.hasSubmenu && <ChevronDown className="w-4 h-4" />}
                         </Link>
                     </div>
                 ))}
@@ -62,7 +63,7 @@ const SideNav = () => {
                     }}
                     className="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors"
                 >
-                    <User className="w-5 h-5" />
+                    <LogOut className="w-5 h-5" />
                     <span>Log out</span>
                 </button>
             </div>
