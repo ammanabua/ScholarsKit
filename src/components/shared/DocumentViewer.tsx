@@ -35,6 +35,7 @@ const DocumentViewer = () => {
         fileName: selectedFile.name,
         fileType: selectedFile.type,
         fileContent: base64Content,
+        userId: user?.id // Include user ID for DynamoDB
       };
       try {
         const res = await fetch(API_GATEWAY_URL ?? '', {
