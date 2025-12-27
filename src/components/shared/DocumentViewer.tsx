@@ -51,28 +51,14 @@ const DocumentViewer = () => {
         const data = await res.json();
         console.log('Upload response:', data);
         console.log('Data keys:', Object.keys(data));
-        const urlToUse = data.url || data.url;
+        const urlToUse = data.url || data.permanentUrl;
         if (urlToUse) {
           console.log('Setting docUrl to:', urlToUse);
-          // Fetch the PDF as blob and create blob URL
-          try {
-            console.log('Fetching PDF from:', urlToUse);
-            const pdfRes = await fetch(urlToUse);
-            console.log('PDF fetch response status:', pdfRes.status);
-            if (!pdfRes.ok) {
-              throw new Error(`Failed to fetch PDF: ${pdfRes.status} ${pdfRes.statusText}`);
-            }
-            const pdfBlob = await pdfRes.blob();
-            console.log('PDF blob size:', pdfBlob.size);
-            const blobUrl = URL.createObjectURL(pdfBlob);
-            setDocUrl(blobUrl);
-            setPdfError(null);
-          } catch (blobError) {
-            console.error('Error fetching PDF blob:', blobError);
-            setPdfError(`Failed to load PDF: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`);
-          }
+          // Use the signed URL directly - no need to fetch as blob
+          setDocUrl(urlToUse);
+          setPdfError(null);
         } else {
-          console.warn('No url or url in response');
+          console.warn('No url in response');
         }
         toast.success('File uploaded successfully');
       } catch (error) {
