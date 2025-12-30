@@ -82,13 +82,14 @@ const DocumentViewer = () => {
     console.log("Create Course clicked");
   };
 
+  console.log('User:', user);
   return (
     <div className="flex w-full max-h-screen overflow-y-scroll">
       <div className="bg-white w-full">
         <div className="border-b border-gray-200 p-4">
           <div className="flex items-center space-x-3">
             <FileText className="w-5 h-5 text-gray-600" />
-            <span className="text-gray-800 font-medium">Welcome {user?.username || user?.email || 'User'}</span>
+            <span className="text-gray-800 font-medium">Welcome {user?.fullname || user?.email || 'User'}</span>
             <ArrowRight className="w-4 h-4 text-gray-400" />
           </div>
         </div>
