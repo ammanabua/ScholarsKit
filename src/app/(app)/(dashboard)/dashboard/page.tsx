@@ -1,13 +1,25 @@
 'use client'
 import AiChat from '@/components/shared/AiChat'
 import DocumentViewer from '@/components/shared/DocumentViewer'
-import { Suspense, useEffect } from 'react'
+import { getCurrentDocument } from '@/components/shared/DocumentViewer'
+import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 
 function DashboardContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [hasDocument, setHasDocument] = useState(false)
+
+  // Check for existing document on mount
+  useEffect(() => {
+    const savedDoc = getCurrentDocument()
+    setHasDocument(savedDoc !== null)
+  }, [])
+
+  const handleDocumentChange = useCallback((hasDoc: boolean) => {
+    setHasDocument(hasDoc)
+  }, [])
 
   useEffect(() => {
     const loginSuccess = searchParams.get('login') === 'success'
@@ -21,9 +33,9 @@ function DashboardContent() {
   return (
     <div className="flex w-full min-h-screen bg-gray-50">
         {/* MAIN CONTENT */}
-        <DocumentViewer />
+        <DocumentViewer onDocumentChange={handleDocumentChange} />
         {/* Right Sidebar - AI Chat */}
-        <AiChat />
+        <AiChat hasDocument={hasDocument} />
     </div>
   )
 }

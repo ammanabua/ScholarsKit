@@ -1,8 +1,12 @@
-'use client '
-import { FileText, Lightbulb, Send, Zap } from 'lucide-react';
+'use client'
+import { FileText, Lightbulb, MessageCircle, Send, Zap } from 'lucide-react';
 import { useState } from 'react'
 
-const AiChat = () => {
+interface AiChatProps {
+  hasDocument?: boolean;
+}
+
+const AiChat = ({ hasDocument = false }: AiChatProps) => {
 
 
   interface Message {
@@ -10,13 +14,6 @@ const AiChat = () => {
     content: string;
     timestamp: string;
   }
-
-//   interface NavItem {
-//     id: string;
-//     label: string;
-//     icon: React.ComponentType<{ className?: string }>;
-//     hasSubmenu?: boolean;
-//   }
 
   interface QuickAction {
     id: string;
@@ -77,13 +74,26 @@ const AiChat = () => {
     }
   };
 
+  // Collapsed state - show only icon taskbar
+  if (!hasDocument) {
+    return (
+      <div className="w-16 flex-shrink-0 bg-white border-l border-gray-200 flex flex-col items-center py-6 transition-all duration-300 ease-in-out overflow-hidden">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="p-3 rounded-full bg-gray-100 text-gray-400" title="Upload a document to chat with Athena AI">
+            <MessageCircle className="w-6 h-6" />
+          </div>
+          <span className="text-xs text-gray-400 text-center px-2">Upload a Document</span>
+        </div>
+      </div>
+    );
+  }
 
+  // Expanded state - full chat interface
   return (
-    <>
-      <div className="w-96 bg-white border-l border-gray-200 flex flex-col wrap">
+    <div className="w-96 bg-white border-l border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden">
         {/* Summary Section */}
         <div className="border-b border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Summary</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Athena AI</h2>
           
           <div className="space-y-3">
             {quickActions.map((action) => (
@@ -153,7 +163,6 @@ const AiChat = () => {
           </div>
         </div>
       </div>
-    </>
   )
 }
 

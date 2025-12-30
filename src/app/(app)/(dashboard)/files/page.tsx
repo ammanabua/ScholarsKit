@@ -1,66 +1,43 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import { FileText, Download, Trash2, Eye } from 'lucide-react'
-
-interface File {
-  id: number
-  name: string
-  uploadedAt: string
-  size: string
-  url: string
-  permanentUrl: string
-}
+import React, { useState } from 'react'
+import { FileText, Download, Trash2, Eye, RefreshCw } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify'
+import { 
+  StoredFile, 
+  deleteStoredFile, 
+  setCurrentDocument 
+} from '@/components/shared/DocumentViewer'
+import { useUserFiles } from '@/hooks/useUserFiles'
 
 const FilesPage = () => {
-  const [files, setFiles] = useState<File[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const { files, isLoading: loading, error, refetch } = useUserFiles()
+  const [deleting, setDeleting] = useState<string | null>(null)
 
-  useEffect(() => {
-    // TODO: Fetch files from your backend API
-    // For now, using mock data
-    const mockFiles: File[] = [
-      {
-        id: 1,
-        name: 'Document 1.pdf',
-        uploadedAt: '2025-11-27',
-        size: '2.5 MB',
-        url: '#',
-        permanentUrl: '#',
-      },
-      {
-        id: 2,
-        name: 'Document 2.pdf',
-        uploadedAt: '2025-11-26',
-        size: '1.8 MB',
-        url: '#',
-        permanentUrl: '#',
-      },
-      {
-        id: 3,
-        name: 'Document 3.pdf',
-        uploadedAt: '2025-11-25',
-        size: '3.2 MB',
-        url: '#',
-        permanentUrl: '#',
-      },
-    ]
-    setFiles(mockFiles)
-    setLoading(false)
-  }, [])
-
-  const handleView = (file: File) => {
-    // TODO: Navigate to viewer with file
-    console.log('View file:', file)
+  const handleView = (file: StoredFile) => {
+    // Set as current document and navigate to dashboard
+    setCurrentDocument(file)
+    router.push('/dashboard')
   }
 
-  const handleDownload = (file: File) => {
-    // TODO: Download file
-    console.log('Download file:', file)
+  const handleDownload = (file: StoredFile) => {
+    // Open file URL in new tab for download
+    window.open(file.url, '_blank')
   }
 
-  const handleDelete = (fileId: number) => {
-    // TODO: Delete file from backend
-    setFiles(files.filter(f => f.id !== fileId))
+  const handleDelete = async (file: StoredFile) => {
+    setDeleting(file.id)
+    try {
+      await deleteStoredFile(file)
+      // Refetch files from server after deletion
+      await refetch()
+      toast.success('File deleted successfully')
+    } catch (error) {
+      toast.error('Failed to delete file: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    } finally {
+      setDeleting(null)
+    }
   }
 
   if (loading) {
@@ -74,8 +51,24 @@ const FilesPage = () => {
   return (
     <div className="flex-1 flex flex-col">
       <div className="border-b border-gray-200 p-6">
-        <h1 className="text-3xl font-bold text-gray-900">My Files</h1>
-        <p className="text-gray-600 mt-2">View and manage all your uploaded documents</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">My Files</h1>
+            <p className="text-gray-600 mt-2">View and manage all your uploaded documents</p>
+          </div>
+          <button
+            onClick={refetch}
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+            title="Refresh files"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
+        {error && (
+          <p className="text-amber-600 text-sm mt-2">
+            Could not fetch latest files from server. Showing cached files.
+          </p>
+        )}
       </div>
 
       <div className="flex-1 p-6">
@@ -117,7 +110,7 @@ const FilesPage = () => {
 
                 {/* File Info */}
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 truncate text-sm mb-2">
+                  <h3 className="font-semibold text-gray-900 truncate text-sm mb-2" title={file.name}>
                     {file.name}
                   </h3>
                   <div className="text-xs text-gray-500 space-y-1 mb-4">
@@ -127,11 +120,12 @@ const FilesPage = () => {
 
                   {/* Delete Button */}
                   <button
-                    onClick={() => handleDelete(file.id)}
-                    className="w-full py-2 px-3 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    onClick={() => handleDelete(file)}
+                    disabled={deleting === file.id}
+                    className="w-full py-2 px-3 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Delete
+                    {deleting === file.id ? 'Deleting...' : 'Delete'}
                   </button>
                 </div>
               </div>

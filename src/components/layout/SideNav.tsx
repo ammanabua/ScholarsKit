@@ -59,6 +59,7 @@ const SideNav = () => {
                     onClick={() => {
                         // Use direct navigation for logout (not fetch) to avoid CORS issues
                         window.location.href = '/api/auth/logout'
+                        localStorage.clear()
                         toast.info('Logging out...')
                     }}
                     className="w-full flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors"
