@@ -62,7 +62,7 @@ export default function LandingPage() {
                 animation: 'fadeInUp 0.8s ease-out 0.6s both'
               }}
             >
-              <div className="mb-4 text-5xl text-center">🤖</div>
+              <Image src="/artificial-intelligence.png" alt="AI-Powered Q&A" width={64} height={64} className="mx-auto mb-4" />
               <h3 className="mb-3 text-2xl font-bold text-gray-900 text-center">
                 AI-Powered Q&A
               </h3>
@@ -78,7 +78,7 @@ export default function LandingPage() {
                 animation: 'fadeInUp 0.8s ease-out 0.7s both'
               }}
             >
-              <div className="mb-4 text-5xl text-center">⚡</div>
+              <Image src="/brain.png" alt="Smart Summaries" width={64} height={64} className="mx-auto mb-4" />
               <h3 className="mb-3 text-2xl font-bold text-gray-900 text-center">
                 Smart Summaries
               </h3>
@@ -94,7 +94,7 @@ export default function LandingPage() {
                 animation: 'fadeInUp 0.8s ease-out 0.8s both'
               }}
             >
-              <div className="mb-4 text-5xl text-center">👥</div>
+              <Image src="/partners.png" alt="Collaborative Workspace" width={64} height={64} className="mx-auto mb-4" />
               <h3 className="mb-3 text-2xl font-bold text-gray-900 text-center">
                 Collaborative Workspace
               </h3>

@@ -23,7 +23,7 @@ const FilesPage = () => {
 
   const handleDownload = (file: StoredFile) => {
     // Open file URL in new tab for download
-    window.open(file.url, '_blank')
+    window.open(file.fileUrl, '_blank')
   }
 
   const handleDelete = async (file: StoredFile) => {
@@ -47,6 +47,8 @@ const FilesPage = () => {
       </div>
     )
   }
+
+  console.log('Files:', files)
 
   return (
     <div className="flex-1 flex flex-col">
@@ -86,7 +88,7 @@ const FilesPage = () => {
                 className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200"
               >
                 {/* Thumbnail */}
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 h-40 flex items-center justify-center relative overflow-hidden group">
+                <div className="bg-gray-50 h-40 flex items-center justify-center relative overflow-hidden group">
                   <FileText className="w-12 h-12 text-blue-400" />
                   
                   {/* Overlay on hover */}

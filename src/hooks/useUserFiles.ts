@@ -28,8 +28,8 @@ export function useUserFiles(): UseUserFilesResult {
     setError(null)
 
     try {
-      // Fetch files from backend for this user
-      const res = await fetch(`${API_GATEWAY_URL}?userId=${userId}`, {
+      // Fetch files from backend for this user using path parameter
+      const res = await fetch(`${API_GATEWAY_URL}/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -53,10 +53,11 @@ export function useUserFiles(): UseUserFilesResult {
         createdAt?: string;
         fileSize?: string | number;
         size?: string;
-        url?: string;
+        fileUrl?: string;
         permanentUrl?: string;
         s3Key?: string;
-        key?: string;
+        textS3Key?: string;
+        textUrl?: string;
       }) => ({
         id: file.fileId || file.id || crypto.randomUUID(),
         name: file.fileName || file.name || 'Unknown',
@@ -64,8 +65,10 @@ export function useUserFiles(): UseUserFilesResult {
         size: typeof file.fileSize === 'number' 
           ? formatFileSize(file.fileSize) 
           : file.fileSize || file.size || 'Unknown',
-        url: file.url || file.permanentUrl || '',
-        s3Key: file.s3Key || file.key,
+        fileUrl: file.fileUrl || file.permanentUrl || '',
+        textUrl: file.textUrl || '',
+        s3Key: file.s3Key || '',
+        textS3Key: file.textS3Key || '',
         fileId: file.fileId || file.id,
       }))
 

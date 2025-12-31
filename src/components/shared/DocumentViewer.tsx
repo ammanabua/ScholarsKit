@@ -14,9 +14,11 @@ export interface StoredFile {
   name: string;
   uploadedAt: string;
   size: string;
-  url: string;
+  fileUrl: string;
   s3Key?: string; // S3 object key for deletion
+  textS3Key?: string; // S3 text object key for deletion
   fileId?: string; // DynamoDB file ID for deletion
+  textUrl?: string; // URL to extracted text file
 }
 
 export const getStoredFiles = (): StoredFile[] => {
@@ -57,6 +59,7 @@ export const deleteStoredFile = async (file: StoredFile): Promise<StoredFile[]> 
         },
         body: JSON.stringify({
           s3Key: file.s3Key,
+          textS3Key: file.textS3Key,
           fileId: file.fileId,
           fileName: file.name,
         }),
@@ -131,6 +134,13 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
       toast.error('Please upload a PDF file');
       return;
     }
+    
+    const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      toast.error('File size must be less than 3MB');
+      return;
+    }
+    
     setLoading(true);
 
     const reader = new FileReader();
@@ -156,7 +166,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
         const data = await res.json();
         console.log('Upload response:', data);
         console.log('Data keys:', Object.keys(data));
-        const urlToUse = data.url || data.permanentUrl;
+        const urlToUse = data.fileUrl || data.permanentUrl;
         if (urlToUse) {
           console.log('Setting docUrl to:', urlToUse);
           // Create file metadata with backend IDs for deletion
@@ -165,8 +175,10 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
             name: selectedFile.name,
             uploadedAt: new Date().toISOString().split('T')[0],
             size: formatFileSize(selectedFile.size),
-            url: urlToUse,
+            fileUrl: urlToUse,
+            textUrl: data.textUrl || '',
             s3Key: data.s3Key || data.key, // S3 object key
+            textS3Key: data.textS3Key || data.textKey || '', // S3 text object key
             fileId: data.fileId || data.id, // DynamoDB file ID
           };
           // Add to files list
@@ -176,7 +188,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
           setCurrentFile(newFile);
           setPdfError(null);
         } else {
-          console.warn('No url in response');
+          console.warn('No fileUrl in response');
         }
         toast.success('File uploaded successfully');
       } catch (error) {
@@ -307,7 +319,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
                       
                       <div className="flex items-center gap-2 mt-2">
                         <div className="h-px w-12 bg-gray-300"></div>
-                        <span className="text-xs text-gray-400 uppercase tracking-wide">PDF only</span>
+                        <span className="text-xs text-gray-400 uppercase tracking-wide">PDF only • Max 3MB</span>
                         <div className="h-px w-12 bg-gray-300"></div>
                       </div>
                     </>
@@ -320,7 +332,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
                 {pdfError && <p className="text-red-600 mb-4">Error loading PDF: {pdfError}</p>}
                 <iframe
                   ref={iframeRef}
-                  src={currentFile.url}
+                  src={currentFile.fileUrl}
                   width="100%"
                   height="729px"
                   style={{ border: '1px solid #ccc', borderRadius: '4px' }}
