@@ -20,6 +20,13 @@ interface Message {
   sources?: { chunkIndex: number; score?: number }[];
 }
 
+interface ConversationHistoryItem {
+  role: string;
+  content: string;
+  ts?: string | number;
+  sources?: { chunkIndex: number; score?: number }[];
+}
+
 interface QuickAction {
   id: string;
   title: string;
@@ -112,7 +119,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
         if (cancelled) return;
 
         if (items.length > 0) {
-          const mapped: Message[] = items.map((it: any) => ({
+          const mapped: Message[] = items.map((it: ConversationHistoryItem) => ({
             id: uid(),
             type: it.role === "assistant" ? "assistant" : it.role === "system" ? "system" : "user",
             content: String(it.content ?? ""),
@@ -297,12 +304,13 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
           sources
         };
       }));
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
       setMessages(prev => prev.map(m => {
         if (m.id !== assistantMsgId) return m;
         return {
           ...m,
-          content: `Sorry — I ran into an error. ${String(e?.message || e)}`,
+          content: `Sorry — I ran into an error. ${errorMessage}`,
           status: "error"
         };
       }));
