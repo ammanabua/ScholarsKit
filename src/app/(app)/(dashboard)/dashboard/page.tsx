@@ -2,6 +2,7 @@
 import AiChat from '@/components/shared/AiChat'
 import DocumentViewer from '@/components/shared/DocumentViewer'
 import { getCurrentDocument } from '@/components/shared/DocumentViewer'
+import { useAuth } from '@/providers/AuthProvider'
 import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
@@ -9,16 +10,22 @@ import { toast } from 'react-toastify'
 function DashboardContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { user } = useAuth()
   const [hasDocument, setHasDocument] = useState(false)
+  const [currentFileId, setCurrentFileId] = useState<string | undefined>(undefined)
 
   // Check for existing document on mount
   useEffect(() => {
     const savedDoc = getCurrentDocument()
     setHasDocument(savedDoc !== null)
+    setCurrentFileId(savedDoc?.fileId || savedDoc?.id)
   }, [])
 
   const handleDocumentChange = useCallback((hasDoc: boolean) => {
     setHasDocument(hasDoc)
+    // Update fileId when document changes
+    const savedDoc = getCurrentDocument()
+    setCurrentFileId(savedDoc?.fileId || savedDoc?.id)
   }, [])
 
   useEffect(() => {
@@ -35,7 +42,7 @@ function DashboardContent() {
         {/* MAIN CONTENT */}
         <DocumentViewer onDocumentChange={handleDocumentChange} />
         {/* Right Sidebar - AI Chat */}
-        <AiChat hasDocument={hasDocument} />
+        <AiChat hasDocument={hasDocument} userId={user?.id} fileId={currentFileId} />
     </div>
   )
 }

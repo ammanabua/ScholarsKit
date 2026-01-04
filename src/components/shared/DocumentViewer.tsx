@@ -115,6 +115,8 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
   // Load persisted current document on mount
   useEffect(() => {
     const savedDoc = getCurrentDocument();
+    console.log('DocumentViewer loading saved doc:', savedDoc);
+    console.log('Saved doc fileUrl:', savedDoc?.fileUrl);
     if (savedDoc) {
       setCurrentFileState(savedDoc);
       onDocumentChange?.(true);
@@ -122,6 +124,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
   }, [onDocumentChange]);
 
   console.log('DocumentViewer rendered with user:', user?.id);
+  console.log('Current file state:', currentFile?.name, 'URL:', currentFile?.fileUrl);
 
   const handleUploadDocument = () => {
     if (fileInputRef.current) {
@@ -164,9 +167,14 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
           throw new Error('Upload failed');
         }
         const data = await res.json();
-        console.log('Upload response:', data);
+        console.log('Upload response (full):', JSON.stringify(data, null, 2));
         console.log('Data keys:', Object.keys(data));
-        const urlToUse = data.fileUrl || data.permanentUrl;
+        console.log('data.fileUrl:', data.fileUrl);
+        console.log('data.permanentUrl:', data.permanentUrl);
+        console.log('data.url:', data.url);
+        console.log('data.signedUrl:', data.signedUrl);
+        // Use fileUrl (signed URL) for immediate viewing after upload
+        const urlToUse = data.fileUrl;
         if (urlToUse) {
           console.log('Setting docUrl to:', urlToUse);
           // Create file metadata with backend IDs for deletion
@@ -328,13 +336,12 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
               </div>
             )}
             {currentFile && (
-              <div className="w-full flex flex-col items-center">
+              <div className="w-full flex flex-col items-center h-screen">
                 {pdfError && <p className="text-red-600 mb-4">Error loading PDF: {pdfError}</p>}
                 <iframe
                   ref={iframeRef}
                   src={currentFile.fileUrl}
-                  width="100%"
-                  height="729px"
+                  className="w-full h-full"
                   style={{ border: '1px solid #ccc', borderRadius: '4px' }}
                   title="PDF Viewer"
                 />

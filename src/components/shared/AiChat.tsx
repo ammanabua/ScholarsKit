@@ -1,39 +1,59 @@
 'use client'
 import { FileText, Lightbulb, MessageCircle, Send, X, Zap } from 'lucide-react';
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image';
 
 interface AiChatProps {
   hasDocument?: boolean;
+  userId?: string;
+  fileId?: string;
 }
 
-const AiChat = ({ hasDocument = false }: AiChatProps) => {
+type MessageType = "system" | "user" | "assistant";
+
+interface Message {
+  id: string;
+  type: MessageType;
+  content: string;
+  timestamp: string;
+  status?: "sending" | "thinking" | "done" | "error";
+  sources?: { chunkIndex: number; score?: number }[];
+}
+
+interface QuickAction {
+  id: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
+
+function nowTime() {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+function uid() {
+  return crypto.randomUUID?.() ?? String(Date.now() + Math.random());
+}
+
+const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
   const [isOpen, setIsOpen] = useState(true);
-
-  interface Message {
-    type: 'system' | 'user';
-    content: string;
-    timestamp: string;
-  }
-
-  interface QuickAction {
-    id: string;
-    title: string;
-    icon: React.ComponentType<{ className?: string }>;
-    description: string;
-  }
-
   const [chatInput, setChatInput] = useState('');
-  const [messages, setMessages] = useState([
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [messages, setMessages] = useState<Message[]>([
     {
+      id: uid(),
       type: 'system',
       content: 'How can I assist you with this document?',
-      timestamp: new Date().toLocaleTimeString()
+      timestamp: nowTime(),
+      status: "done"
     }
   ]);
 
-  
-  const quickActions = [
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const quickActions: QuickAction[] = useMemo(() => ([
     {
       id: 'summarize',
       title: 'Summarize this document',
@@ -52,35 +72,251 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
       icon: Zap,
       description: 'Create study flashcards from content'
     }
-  ];
+  ]), []);
 
-  const handleQuickAction = (action: QuickAction) => {
-    const newMessage: Message = {
-      type: 'user',
-      content: action.title,
-      timestamp: new Date().toLocaleTimeString()
-    };
-    setMessages([...messages, newMessage]);
+  useEffect(() => {
+    // auto-scroll on new messages
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isOpen]);
+
+  // OPTIONAL: load conversation history when panel opens (and doc exists)
+  useEffect(() => {
+    if (!hasDocument || !isOpen) return;
+    if (!userId || !fileId) return;
+    if (!API_BASE) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/${userId}/${fileId}/conversation/query`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, fileId, limit: 30 })
+        });
+
+        if (!res.ok) {
+          if (res.status === 409) {
+            const data = await res.json();
+            throw new Error(
+              `Preparing document… (${data.embeddedChunkCount || 0}/${data.chunkCount || "?"})`
+            );
+          }
+          throw new Error(await res.text());
+        }
+
+        const data = await res.json();
+
+        // Expecting: { items: [{ role, content, ts, sources }] }
+        const items = Array.isArray(data?.items) ? data.items : [];
+        if (cancelled) return;
+
+        if (items.length > 0) {
+          const mapped: Message[] = items.map((it: any) => ({
+            id: uid(),
+            type: it.role === "assistant" ? "assistant" : it.role === "system" ? "system" : "user",
+            content: String(it.content ?? ""),
+            timestamp: it.ts ? new Date(it.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : nowTime(),
+            status: "done",
+            sources: Array.isArray(it.sources) ? it.sources : []
+          }));
+
+          // Replace current system seed with history + keep initial system message if you want:
+          setMessages(prev => {
+            // keep first system message if no history contains it
+            const seed = prev.length === 1 ? prev : prev.slice(0, 1);
+            return [...seed, ...mapped];
+          });
+        }
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [hasDocument, isOpen, userId, fileId]);
+
+  const handleQuickAction = async (action: QuickAction) => {
+    await sendMessage(action.title);
   };
 
-  const handleSendMessage = () => {
-    if (chatInput.trim()) {
-      const newMessage = {
-        type: 'user',
-        content: chatInput,
-        timestamp: new Date().toLocaleTimeString()
-      };
-      setMessages([...messages, newMessage]);
+  const handleSendMessage = async () => {
+    await sendMessage(chatInput);
+  };
+
+  async function sendMessage(text: string) {
+    const question = text.trim();
+    if (!question) return;
+
+    if (!hasDocument || !userId || !fileId) {
+      // fallback UI behavior
+      setMessages(prev => ([
+        ...prev,
+        { id: uid(), type: "user", content: question, timestamp: nowTime(), status: "done" },
+        {
+          id: uid(),
+          type: "system",
+          content: "Upload/select a document first so I can answer using its content.",
+          timestamp: nowTime(),
+          status: "done"
+        }
+      ]));
       setChatInput('');
+      return;
     }
-  };
+
+    if (!API_BASE) {
+      setMessages(prev => ([
+        ...prev,
+        { id: uid(), type: "user", content: question, timestamp: nowTime(), status: "done" },
+        {
+          id: uid(),
+          type: "system",
+          content: "Missing NEXT_PUBLIC_API_BASE_URL. Set it in Amplify environment variables.",
+          timestamp: nowTime(),
+          status: "error"
+        }
+      ]));
+      setChatInput('');
+      return;
+    }
+
+    // 1) Add user message
+    const userMsgId = uid();
+    setMessages(prev => ([
+      ...prev,
+      { id: userMsgId, type: "user", content: question, timestamp: nowTime(), status: "done" }
+    ]));
+    setChatInput('');
+
+    // 2) Add assistant placeholder
+    const assistantMsgId = uid();
+    setMessages(prev => ([
+      ...prev,
+      { id: assistantMsgId, type: "assistant", content: "Thinking…", timestamp: nowTime(), status: "thinking" }
+    ]));
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/${userId}/${fileId}/answer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, fileId, question, topK: 5, lastTurns: 8 })
+      });
+
+      // ✅ Handle processing
+      if (res.status === 409) {
+        const data = await res.json().catch(() => ({}));
+        const done = Number(data.embeddedChunkCount ?? 0);
+        const total = Number(data.chunkCount ?? 0);
+
+        // Update placeholder to progress
+        setMessages(prev => prev.map(m => {
+          if (m.id !== assistantMsgId) return m;
+          return {
+            ...m,
+            content: total
+              ? `Preparing your document… (${done}/${total})\nTry again in a moment.`
+              : `Preparing your document…\nTry again in a moment.`,
+            status: "thinking"
+          };
+        }));
+
+        // ✅ Optional: auto-retry loop (lightweight)
+        // poll a few times to avoid users needing to resend
+        let attempts = 0;
+        while (attempts < 6) {
+          await new Promise(r => setTimeout(r, 2500));
+          attempts++;
+
+          const retry = await fetch(`${API_BASE}/${userId}/${fileId}/answer`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, fileId, question, topK: 5, lastTurns: 8 })
+          });
+
+          if (retry.status === 409) {
+            const prog = await retry.json().catch(() => ({}));
+            const d = Number(prog.embeddedChunkCount ?? 0);
+            const t = Number(prog.chunkCount ?? 0);
+
+            setMessages(prev => prev.map(m => {
+              if (m.id !== assistantMsgId) return m;
+              return {
+                ...m,
+                content: t
+                  ? `Preparing your document… (${d}/${t})`
+                  : `Preparing your document…`,
+                status: "thinking"
+              };
+            }));
+            continue;
+          }
+
+          if (!retry.ok) {
+            const txt = await retry.text();
+            throw new Error(txt || "Request failed");
+          }
+
+          const data2 = await retry.json();
+          const answer2 = String(data2?.answer ?? "");
+          const sources2 = Array.isArray(data2?.sources) ? data2.sources : [];
+
+          setMessages(prev => prev.map(m => {
+            if (m.id !== assistantMsgId) return m;
+            return { ...m, content: answer2 || "No answer returned.", status: "done", sources: sources2 };
+          }));
+
+          return; // ✅ success
+        }
+
+        // If retries exhausted
+        setMessages(prev => prev.map(m => {
+          if (m.id !== assistantMsgId) return m;
+          return { ...m, content: "Still preparing the document. Please try again in a minute.", status: "done" };
+        }));
+        return;
+      }
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || "Request failed");
+      }
+
+      const data = await res.json();
+      const answer = String(data?.answer ?? "");
+      const sources = Array.isArray(data?.sources) ? data.sources : [];
+
+      setMessages(prev => prev.map(m => {
+        if (m.id !== assistantMsgId) return m;
+        return {
+          ...m,
+          content: answer || "I couldn’t generate an answer from the available context.",
+          status: "done",
+          sources
+        };
+      }));
+    } catch (e: any) {
+      setMessages(prev => prev.map(m => {
+        if (m.id !== assistantMsgId) return m;
+        return {
+          ...m,
+          content: `Sorry — I ran into an error. ${String(e?.message || e)}`,
+          status: "error"
+        };
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   // No document state - show disabled icon
   if (!hasDocument) {
     return (
       <>
         {/* Desktop - collapsed icon bar */}
-        <div className="hidden md:flex flex-shrink-0 h-full w-16 bg-white border-l border-gray-200 flex-col items-center py-6">
+        <div className="hidden md:flex flex-shrink-0 h-screen w-16 bg-white border-l border-gray-200 flex-col items-center py-6">
           <div className="flex flex-col items-center space-y-4">
             <div className="p-3 rounded-full bg-gray-100 text-gray-400" title="Upload a document to chat with Athena AI">
               <Image src="/ai.png" alt="Athena AI" width={24} height={24} className="opacity-50" />
@@ -92,7 +328,7 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
         {/* Mobile - floating icon button (above bottom nav) */}
         <div className="md:hidden fixed bottom-24 right-4 z-40">
           <div className="p-3 rounded-full bg-gray-200 text-gray-400 shadow-lg" title="Upload a document to chat with Athena AI">
-              <Image src="/ai.png" alt="Athena AI" width={24} height={24} className="opacity-50" />
+            <Image src="/ai.png" alt="Athena AI" width={24} height={24} className="opacity-50" />
           </div>
         </div>
       </>
@@ -103,12 +339,12 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
   return (
     <>
       {/* Desktop Layout */}
-      <div className={`hidden md:flex flex-shrink-0 h-full overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isOpen ? 'w-96' : 'w-16'}`}>
+      <div className={`hidden md:flex flex-shrink-0 h-screen overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isOpen ? 'w-96' : 'w-16'}`}>
         {/* Collapsed state - toggle button */}
-        <div 
+        <div
           className={`
-            h-full w-16 bg-white border-l border-gray-200 
-            flex flex-col items-center py-6 
+            h-screen w-16 bg-white border-l border-gray-200
+            flex flex-col items-center py-6
             transition-all duration-500 ease-in-out cursor-pointer
             ${isOpen ? 'hidden' : 'flex'}
           `}
@@ -123,21 +359,21 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
         </div>
 
         {/* Expanded state - full panel */}
-        <div 
+        <div
           className={`
-            w-96 h-full bg-white border-l border-gray-200 
+            w-96 h-screen bg-white border-l border-gray-200
             flex flex-col flex-shrink-0 overflow-hidden
-            ${isOpen ? 'block' : 'hidden'}
+            ${isOpen ? 'flex' : 'hidden'}
           `}
         >
           {/* Summary Section */}
-          <div className="border-b border-gray-200 p-6">
+          <div className="border-b border-gray-200 p-6 flex-shrink-0">
             <div className='flex gap-4 items-center mb-4 justify-between'>
               <div className='flex gap-4 items-center'>
                 <Image src="/owl.png" alt="Athena AI Logo" width={32} height={32} />
                 <h2 className="text-xl font-semibold text-gray-900">Athena AI</h2>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
                 title="Close chat"
@@ -145,7 +381,7 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="space-y-3">
               {quickActions.map((action) => (
                 <button
@@ -159,6 +395,9 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
                       <div className="font-medium text-gray-900 group-hover:text-blue-900">
                         {action.title}
                       </div>
+                      <div className="text-xs text-gray-500 group-hover:text-blue-700">
+                        {action.description}
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -167,49 +406,71 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
           </div>
 
           {/* Chat Section */}
-          <div className="flex-1 flex flex-col relative pb-20">
-            <div className="p-4 border-b border-gray-200">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
               <h3 className="text-lg font-semibold text-gray-900">Chat</h3>
+              {isLoading && <span className="text-xs text-gray-500">Thinking…</span>}
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-              {messages.map((message, index) => (
+            <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
+              {messages.map((message) => (
                 <div
-                  key={index}
+                  key={message.id}
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
                     className={`max-w-xs rounded-lg px-4 py-2 ${
                       message.type === 'user'
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-800'
+                        : message.status === "error"
+                          ? 'bg-red-50 text-red-800 border border-red-200'
+                          : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                    {/* citations */}
+                    {message.type === "assistant" && message.sources?.length ? (
+                      <div className="mt-2 text-xs opacity-80">
+                        Sources:{" "}
+                        {message.sources.slice(0, 6).map((s, i) => (
+                          <span key={`${s.chunkIndex}-${i}`} className="mr-2">
+                            [{s.chunkIndex}]
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+
                     <p className="text-xs opacity-70 mt-1">{message.timestamp}</p>
                   </div>
                 </div>
               ))}
+              <div ref={bottomRef} />
             </div>
 
-            {/* Chat Input - Fixed at bottom of screen */}
-            <div className="fixed bottom-0 right-0 w-96 p-4 border-t border-gray-200 bg-white">
+            {/* Chat Input - desktop */}
+            <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
               <div className="flex space-x-2">
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Enter a message..."
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-60 transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>
+              </div>
+              <div className="mt-2 text-[11px] text-gray-500">
+                Using document context • {userId?.slice(0, 6)}… / {fileId?.slice(0, 6)}…
               </div>
             </div>
           </div>
@@ -217,7 +478,6 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
       </div>
 
       {/* Mobile Layout */}
-      {/* Floating toggle button (above bottom nav) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`md:hidden fixed bottom-24 right-4 z-40 p-4 rounded-full shadow-lg transition-all duration-300 ${
@@ -228,35 +488,31 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </button>
 
-      {/* Mobile overlay panel */}
-      <div 
+      <div
         className={`
           md:hidden fixed inset-0 z-30 transition-all duration-300 ease-in-out
           ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
       >
-        {/* Backdrop */}
-        <div 
+        <div
           className="absolute inset-0 bg-black/30"
           onClick={() => setIsOpen(false)}
         />
-        
-        {/* Panel sliding from right */}
-        <div 
+
+        <div
           className={`
             absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-xl
             flex flex-col transition-transform duration-300 ease-in-out
             ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           `}
         >
-          {/* Header */}
           <div className="border-b border-gray-200 p-4">
             <div className='flex gap-4 items-center justify-between'>
               <div className='flex gap-4 items-center'>
                 <Image src="/owl.png" alt="Athena AI Logo" width={32} height={32} />
                 <h2 className="text-xl font-semibold text-gray-900">Athena AI</h2>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
                 title="Close chat"
@@ -266,7 +522,6 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="border-b border-gray-200 p-4">
             <div className="space-y-2">
               {quickActions.map((action) => (
@@ -286,50 +541,69 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
             </div>
           </div>
 
-          {/* Chat Section */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <div className="p-4 border-b border-gray-200">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
               <h3 className="text-lg font-semibold text-gray-900">Chat</h3>
+              {isLoading && <span className="text-xs text-gray-500">Thinking…</span>}
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-              {messages.map((message, index) => (
+            <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
+              {messages.map((message) => (
                 <div
-                  key={index}
+                  key={message.id}
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
                     className={`max-w-[80%] rounded-lg px-4 py-2 ${
                       message.type === 'user'
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-800'
+                        : message.status === "error"
+                          ? 'bg-red-50 text-red-800 border border-red-200'
+                          : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                    {message.type === "assistant" && message.sources?.length ? (
+                      <div className="mt-2 text-xs opacity-80">
+                        Sources:{" "}
+                        {message.sources.slice(0, 6).map((s, i) => (
+                          <span key={`${s.chunkIndex}-${i}`} className="mr-2">
+                            [{s.chunkIndex}]
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+
                     <p className="text-xs opacity-70 mt-1">{message.timestamp}</p>
                   </div>
                 </div>
               ))}
+              <div ref={bottomRef} />
             </div>
 
-            {/* Chat Input */}
             <div className="p-4 border-t border-gray-200 bg-white">
               <div className="flex space-x-2">
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Enter a message..."
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-60 transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>
+              </div>
+
+              <div className="mt-2 text-[11px] text-gray-500">
+                Using document context
               </div>
             </div>
           </div>
@@ -339,4 +613,4 @@ const AiChat = ({ hasDocument = false }: AiChatProps) => {
   )
 }
 
-export default AiChat
+export default AiChat;
