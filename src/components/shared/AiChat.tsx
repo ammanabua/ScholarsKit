@@ -1,38 +1,12 @@
 'use client'
-import { FileText, Lightbulb, MessageCircle, Send, X, Zap } from 'lucide-react';
+import { FileText, Lightbulb, Send, X, Zap } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AiChatProps, ConversationHistoryItem, Message, QuickAction } from '@/interfaces/AiChat';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-interface AiChatProps {
-  hasDocument?: boolean;
-  userId?: string;
-  fileId?: string;
-}
 
-type MessageType = "system" | "user" | "assistant";
-
-interface Message {
-  id: string;
-  type: MessageType;
-  content: string;
-  timestamp: string;
-  status?: "sending" | "thinking" | "done" | "error";
-  sources?: { chunkIndex: number; score?: number }[];
-}
-
-interface ConversationHistoryItem {
-  role: string;
-  content: string;
-  ts?: string | number;
-  sources?: { chunkIndex: number; score?: number }[];
-}
-
-interface QuickAction {
-  id: string;
-  title: string;
-  icon: React.ComponentType<{ className?: string }>;
-  description: string;
-}
 
 const API_BASE = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
 
@@ -326,7 +300,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
         {/* Desktop - collapsed icon bar */}
         <div className="hidden md:flex flex-shrink-0 h-screen w-16 bg-white border-l border-gray-200 flex-col items-center py-6">
           <div className="flex flex-col items-center space-y-4">
-            <div className="p-3 rounded-full bg-gray-100 text-gray-400" title="Upload a document to chat with Athena AI">
+            <div className="p-3 rounded-full bg-blue-100 text-gray-400" title="Upload a document to chat with Athena AI">
               <Image src="/ai.png" alt="Athena AI" width={24} height={24} className="opacity-50" />
             </div>
             <span className="text-xs text-gray-400 text-center px-2">Upload a Document</span>
@@ -377,10 +351,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
           {/* Summary Section */}
           <div className="border-b border-gray-200 p-6 flex-shrink-0">
             <div className='flex gap-4 items-center mb-4 justify-between'>
-              <div className='flex gap-4 items-center'>
-                <Image src="/owl.png" alt="Athena AI Logo" width={32} height={32} />
-                <h2 className="text-xl font-semibold text-gray-900">Athena AI</h2>
-              </div>
+              <h3 className="text-md font-normal text-gray-900">Quick Actions</h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
@@ -395,7 +366,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                 <button
                   key={action.id}
                   onClick={() => handleQuickAction(action)}
-                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                  className="w-full text-left p-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
                 >
                   <div className="flex items-start space-x-3">
                     <action.icon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 mt-0.5" />
@@ -416,8 +387,11 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
           {/* Chat Section */}
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-              <h3 className="text-lg font-semibold text-gray-900">Chat</h3>
-              {isLoading && <span className="text-xs text-gray-500">Thinking…</span>}
+              <div className='flex gap-4 items-center'>
+                <Image src="/owl.png" alt="Athena AI Logo" width={32} height={32} />
+                <h2 className="text-xl font-semibold text-gray-900">Athena AI</h2>
+              </div>
+              {isLoading && <span className="text-xs text-gray-500 animate-pulse">Thinking…</span>}
             </div>
 
             {/* Messages */}
@@ -436,20 +410,11 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                           : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-
-                    {/* citations */}
-                    {message.type === "assistant" && message.sources?.length ? (
-                      <div className="mt-2 text-xs opacity-80">
-                        Sources:{" "}
-                        {message.sources.slice(0, 6).map((s, i) => (
-                          <span key={`${s.chunkIndex}-${i}`} className="mr-2">
-                            [{s.chunkIndex}]
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-
+                    <div className="text-sm whitespace-pre-wrap">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                     <p className="text-xs opacity-70 mt-1">{message.timestamp}</p>
                   </div>
                 </div>
@@ -466,7 +431,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Enter a message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border text-gray-700 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
                 />
                 <button
@@ -477,9 +442,9 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                   <Send className="w-4 h-4" />
                 </button>
               </div>
-              <div className="mt-2 text-[11px] text-gray-500">
+              {/* <div className="mt-2 text-[11px] text-gray-500">
                 Using document context • {userId?.slice(0, 6)}… / {fileId?.slice(0, 6)}…
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -489,11 +454,11 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`md:hidden fixed bottom-24 right-4 z-40 p-4 rounded-full shadow-lg transition-all duration-300 ${
-          isOpen ? 'bg-gray-600 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'
+          isOpen ? 'bg-gray-600 text-white' : 'bg-blue-400 text-white hover:bg-blue-600'
         }`}
         title={isOpen ? 'Close Athena AI' : 'Open Athena AI'}
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? <X className="w-6 h-6" /> : <Image src="/ai.png" alt="Athena AI" width={24} height={24} className="" />}
       </button>
 
       <div
@@ -552,7 +517,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
               <h3 className="text-lg font-semibold text-gray-900">Chat</h3>
-              {isLoading && <span className="text-xs text-gray-500">Thinking…</span>}
+              {isLoading && <span className="text-xs text-gray-500 animate-pulse">Thinking…</span>}
             </div>
 
             <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
@@ -572,7 +537,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                   >
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
-                    {message.type === "assistant" && message.sources?.length ? (
+                    {/* {message.type === "assistant" && message.sources?.length ? (
                       <div className="mt-2 text-xs opacity-80">
                         Sources:{" "}
                         {message.sources.slice(0, 6).map((s, i) => (
@@ -581,7 +546,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                           </span>
                         ))}
                       </div>
-                    ) : null}
+                    ) : null} */}
 
                     <p className="text-xs opacity-70 mt-1">{message.timestamp}</p>
                   </div>
@@ -598,7 +563,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Enter a message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
                 />
                 <button
@@ -608,10 +573,6 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                 >
                   <Send className="w-4 h-4" />
                 </button>
-              </div>
-
-              <div className="mt-2 text-[11px] text-gray-500">
-                Using document context
               </div>
             </div>
           </div>

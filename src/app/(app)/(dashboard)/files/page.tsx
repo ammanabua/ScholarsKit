@@ -4,12 +4,12 @@ import { FileText, Download, Trash2, Eye, RefreshCw, CloudUpload } from 'lucide-
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { 
-  StoredFile, 
   deleteStoredFile, 
   setCurrentDocument,
   getStoredFiles,
   saveStoredFiles
 } from '@/components/shared/DocumentViewer'
+import { StoredFile } from '@/interfaces/DocumentViewer'
 import { useUserFiles } from '@/hooks/useUserFiles'
 import { useAuth } from '@/providers/AuthProvider'
 
@@ -266,7 +266,7 @@ const FilesPage = () => {
   return (
     <div 
       ref={dropZoneRef}
-      className="flex-1 flex flex-col relative"
+      className="flex-1 flex flex-col relative min-h-screen"
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -283,7 +283,7 @@ const FilesPage = () => {
 
       {/* Drag overlay */}
       {isDragging && (
-        <div className="absolute inset-0 bg-blue-500 bg-opacity-20 z-50 flex items-center justify-center border-4 border-dashed border-blue-500 rounded-lg">
+        <div className="absolute inset-0 bg-blue-500 bg-opacity-20 z-50 flex items-center justify-center border-4 border-dashed border-blue-500 rounded-lg h-screen">
           <div className="text-center">
             <CloudUpload className="w-16 h-16 text-blue-600 mx-auto mb-4" />
             <p className="text-xl font-semibold text-blue-700">Drop your PDF here</p>
@@ -302,7 +302,7 @@ const FilesPage = () => {
         </div>
       )}
 
-      <div className="border-b border-gray-200 p-6">
+      <div className="border-b border-gray-800 p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Files</h1>
@@ -357,20 +357,20 @@ const FilesPage = () => {
               >
                 {/* Thumbnail */}
                 <div className="bg-gray-50 h-40 flex items-center justify-center relative overflow-hidden group">
-                  <FileText className="w-12 h-12 text-blue-400" />
+                  <FileText className="w-12 h-12 text-blue-200" />
                   
                   {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-3">
+                  <div className="absolute inset-0 bg-black/40 md:bg-black/0 md:group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center gap-3">
                     <button
                       onClick={() => handleView(file)}
-                      className="opacity-0 group-hover:opacity-100 p-2 bg-white rounded-full hover:bg-gray-100 transition-all"
+                      className="md:opacity-0 md:group-hover:opacity-100 p-2 bg-white rounded-full hover:bg-gray-100 transition-all shadow-md"
                       title="View file"
                     >
                       <Eye className="w-5 h-5 text-blue-600" />
                     </button>
                     <button
                       onClick={() => handleDownload(file)}
-                      className="opacity-0 group-hover:opacity-100 p-2 bg-white rounded-full hover:bg-gray-100 transition-all"
+                      className="md:opacity-0 md:group-hover:opacity-100 p-2 bg-white rounded-full hover:bg-gray-100 transition-all shadow-md"
                       title="Download file"
                     >
                       <Download className="w-5 h-5 text-green-600" />

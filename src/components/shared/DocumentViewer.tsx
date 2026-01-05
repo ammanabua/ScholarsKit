@@ -4,22 +4,13 @@ import React, { useEffect, useRef, useState, DragEvent } from 'react'
 import GeneralLoader from './GeneralLoader';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/providers/AuthProvider';
+import { StoredFile } from '@/interfaces/DocumentViewer';
 
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
 export const FILES_STORAGE_KEY = 'scholarskit_files';
 export const CURRENT_DOC_KEY = 'scholarskit_current_doc';
 
-export interface StoredFile {
-  id: string;
-  name: string;
-  uploadedAt: string;
-  size: string;
-  fileUrl: string;
-  s3Key?: string; // S3 object key for deletion
-  textS3Key?: string; // S3 text object key for deletion
-  fileId?: string; // DynamoDB file ID for deletion
-  textUrl?: string; // URL to extracted text file
-}
+
 
 export const getStoredFiles = (): StoredFile[] => {
   if (typeof window === 'undefined') return [];

@@ -6,7 +6,7 @@ export default function LandingPage() {
   const year = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 w-full">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 w-full overflow-y-auto">
       {/* Hero Section */}
       <section className="relative overflow-hidden px-6 py-10 text-center">
         <div 

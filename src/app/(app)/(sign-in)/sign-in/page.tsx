@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { ArrowRight } from "lucide-react";
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -25,22 +26,22 @@ function SignInContent() {
         <Image src="/logo-black.svg" alt="Logo" width={75} height={25} className="mx-auto mb-6" />
       </Link>
       <div className="max-w-sm">
-        <h3 className="text-xl font-semibold mb-6 text-center text-slate-800">Welcome Back</h3>
+        <h3 className="text-xl font-semibold mb-6 text-center text-slate-800">Welcome to ScholarsKit</h3>
         <p className="text-sm text-slate-600 text-center mb-6">
           Sign in to access your account
         </p>
         <button
           onClick={handleSignIn}
-          className="w-full bg-blue-600 text-white py-3 rounded font-semibold hover:bg-blue-700 transition-colors"
+          className="w-full bg-indigo-600 text-white py-3 rounded font-semibold hover:bg-indigo-700 transition-colors"
         >
-          Sign In with Cognito
+          Continue <ArrowRight className="inline-block w-4 h-4 ml-2" />
         </button>
-        <p className="mt-6 text-center text-sm text-slate-800">
+        {/* <p className="mt-6 text-center text-sm text-slate-800">
           Don&apos;t have an account?{' '}
           <Link href="/sign-up" className="text-blue-600 hover:underline">
             Sign Up
           </Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

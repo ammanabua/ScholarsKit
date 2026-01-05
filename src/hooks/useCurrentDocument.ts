@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { StoredFile, getCurrentDocument, setCurrentDocument as setStoredCurrentDocument } from '@/components/shared/DocumentViewer'
+import { getCurrentDocument, setCurrentDocument as setStoredCurrentDocument } from '@/components/shared/DocumentViewer'
+import { StoredFile } from '@/interfaces/DocumentViewer'
 
 interface UseCurrentDocumentResult {
   currentDocument: StoredFile | null

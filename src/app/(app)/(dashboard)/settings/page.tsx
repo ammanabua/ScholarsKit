@@ -138,7 +138,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">Settings</h1>
@@ -309,6 +309,6 @@ export default function SettingsPage() {
           Delete account
         </button>
       </section>
-    </main>
+    </div>
   )
 }

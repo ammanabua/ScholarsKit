@@ -1,5 +1,5 @@
 'use client'
-import { ChevronDown, ChevronLeft, ChevronRight, BookOpen, FileText, Users, MonitorDot, Settings, LogOut } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, FileText, MonitorDot, Settings, LogOut } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -14,8 +14,8 @@ const SideNav = () => {
     const navItems = [
     { link: '/dashboard', label: 'Home', icon: MonitorDot },
     { link: '/files', label: 'Files', icon: FileText, hasSubmenu: true },
-    { link: '/courses', label: 'Courses', icon: BookOpen, hasSubmenu: true },
-    { link: '/groups', label: 'Groups', icon: Users, hasSubmenu: true },
+    // { link: '/courses', label: 'Courses', icon: BookOpen, hasSubmenu: true },
+    // { link: '/groups', label: 'Groups', icon: Users, hasSubmenu: true },
     { link: '/settings', label: 'Settings', icon: Settings }
   ];
 
