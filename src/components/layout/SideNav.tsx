@@ -20,9 +20,9 @@ const SideNav = () => {
   ];
 
   const handleLogout = () => {
-    window.location.href = '/api/auth/logout'
     localStorage.clear()
     toast.info('Logging out...')
+    window.location.href = '/api/auth/logout'
   };
 
   return (
@@ -32,9 +32,7 @@ const SideNav = () => {
         {/* Logo */}
         <div className={`p-6 border-b border-slate-700 flex flex-col items-center ${isCollapsed ? 'space-y-2' : 'space-y-4'}`}>
           <div className="w-16 h-16 rounded-lg flex items-center justify-center">
-            <Link href="/">
-              <Image src='/logo-white.svg' width={15} height={15} alt="scholars kit logo" className="w-15 h-15" />
-            </Link>
+            <Image src='/logo-white.svg' width={15} height={15} alt="scholars kit logo" className="w-15 h-15" />
           </div>
           {!isCollapsed && <span className="text-xl font-semibold">ScholarsKit</span>}
         </div>
