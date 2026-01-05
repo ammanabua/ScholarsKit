@@ -8,5 +8,6 @@ export interface StoredFile {
   textS3Key?: string; // S3 text object key for deletion
   fileId?: string; // DynamoDB file ID for deletion
   textUrl?: string; // URL to extracted text file
+  urlCreatedAt?: string; // Timestamp when signed URL was created (for expiration tracking)
 }
 

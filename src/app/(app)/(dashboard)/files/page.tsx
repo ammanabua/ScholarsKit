@@ -153,6 +153,7 @@ const FilesPage = () => {
             s3Key: data.s3Key || data.key,
             textS3Key: data.textS3Key || data.textKey || '',
             fileId: data.fileId || data.id,
+            urlCreatedAt: new Date().toISOString(), // Track when signed URL was created
           }
           console.log('New file object:', newFile)
           // Add to files list

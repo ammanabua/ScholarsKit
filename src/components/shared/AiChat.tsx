@@ -33,6 +33,16 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
   ]);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Helper function to scroll to bottom
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    } else {
+      bottomRef.current?.scrollIntoView({ behavior });
+    }
+  };
 
   const quickActions: QuickAction[] = useMemo(() => ([
     {
@@ -55,16 +65,29 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
     }
   ]), []);
 
+  // Scroll to bottom on initial mount
   useEffect(() => {
-    // auto-scroll on new messages or when panel opens
+    // Immediate scroll on mount (no animation for initial state)
+    const timeout = setTimeout(() => {
+      scrollToBottom("instant");
+    }, 50);
+    return () => clearTimeout(timeout);
+  }, []); // Empty deps = only on mount
+
+  // Scroll when messages change
+  useEffect(() => {
+    scrollToBottom("smooth");
+  }, [messages]);
+
+  // Scroll when panel opens
+  useEffect(() => {
     if (isOpen) {
-      // Small delay to ensure DOM is rendered after panel opens
       const timeout = setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+        scrollToBottom("smooth");
+      }, 300);
       return () => clearTimeout(timeout);
     }
-  }, [messages, isOpen]);
+  }, [isOpen]);
 
   // OPTIONAL: load conversation history when panel opens (and doc exists)
   useEffect(() => {
@@ -401,7 +424,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
+            <div ref={messagesContainerRef} className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
               {messages.map((message) => (
                 <div
                   key={message.id}

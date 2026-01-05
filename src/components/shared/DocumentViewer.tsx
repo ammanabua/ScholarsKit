@@ -103,16 +103,53 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
     onDocumentChange?.(file !== null);
   };
 
+  // Check if signed URL has expired (1 hour from creation)
+  const isUrlExpired = (file: StoredFile | null): boolean => {
+    if (!file?.urlCreatedAt) return false; // No timestamp = assume valid (legacy files)
+    const createdAt = new Date(file.urlCreatedAt).getTime();
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+    return now - createdAt > oneHour;
+  };
+
   // Load persisted current document on mount
   useEffect(() => {
     const savedDoc = getCurrentDocument();
     console.log('DocumentViewer loading saved doc:', savedDoc);
     console.log('Saved doc fileUrl:', savedDoc?.fileUrl);
     if (savedDoc) {
+      // Check if URL has expired
+      if (isUrlExpired(savedDoc)) {
+        console.log('Document URL has expired, clearing current document');
+        setCurrentDocument(null);
+        onDocumentChange?.(false);
+        return;
+      }
       setCurrentFileState(savedDoc);
       onDocumentChange?.(true);
     }
   }, [onDocumentChange]);
+
+  // Check for URL expiration periodically (every minute)
+  useEffect(() => {
+    if (!currentFile) return;
+
+    const checkExpiration = () => {
+      if (isUrlExpired(currentFile)) {
+        console.log('Document URL has expired, unmounting viewer');
+        setCurrentFile(null);
+        setPdfError(null);
+      }
+    };
+
+    // Check every minute
+    const interval = setInterval(checkExpiration, 60 * 1000);
+
+    // Also check immediately in case it just expired
+    checkExpiration();
+
+    return () => clearInterval(interval);
+  }, [currentFile]);
 
   console.log('DocumentViewer rendered with user:', user?.id);
   console.log('Current file state:', currentFile?.name, 'URL:', currentFile?.fileUrl);
@@ -179,6 +216,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
             s3Key: data.s3Key || data.key, // S3 object key
             textS3Key: data.textS3Key || data.textKey || '', // S3 text object key
             fileId: data.fileId || data.id, // DynamoDB file ID
+            urlCreatedAt: new Date().toISOString(), // Track when signed URL was created
           };
           // Add to files list
           const existingFiles = getStoredFiles();
