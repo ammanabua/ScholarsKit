@@ -481,10 +481,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
         >
           <div className="border-b border-gray-200 p-4">
             <div className='flex gap-4 items-center justify-between'>
-              <div className='flex gap-4 items-center'>
-                <Image src="/owl.png" alt="Athena AI Logo" width={32} height={32} />
-                <h2 className="text-xl font-semibold text-gray-900">Athena AI</h2>
-              </div>
+              <h3 className="text-md font-semibold text-gray-900">Quick Actions</h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
@@ -516,7 +513,10 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
 
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-              <h3 className="text-lg font-semibold text-gray-900">Chat</h3>
+              <div className='flex gap-4 items-center'>
+                <Image src="/owl.png" alt="Athena AI Logo" width={32} height={32} />
+                <h2 className="text-xl font-semibold text-gray-900">Athena AI</h2>
+              </div>
               {isLoading && <span className="text-xs text-gray-500 animate-pulse">Thinking…</span>}
             </div>
 
@@ -535,7 +535,11 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
                           : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <div className="text-sm whitespace-pre-wrap">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
 
                     {/* {message.type === "assistant" && message.sources?.length ? (
                       <div className="mt-2 text-xs opacity-80">
