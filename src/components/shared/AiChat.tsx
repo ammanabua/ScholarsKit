@@ -56,8 +56,14 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
   ]), []);
 
   useEffect(() => {
-    // auto-scroll on new messages
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // auto-scroll on new messages or when panel opens
+    if (isOpen) {
+      // Small delay to ensure DOM is rendered after panel opens
+      const timeout = setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
   }, [messages, isOpen]);
 
   // OPTIONAL: load conversation history when panel opens (and doc exists)
