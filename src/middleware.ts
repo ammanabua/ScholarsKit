@@ -81,13 +81,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - api routes (they handle their own auth)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, public files
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)',
+    // Explicitly match protected routes
+    '/dashboard/:path*',
+    '/files/:path*',
+    '/courses/:path*',
+    '/groups/:path*',
+    '/settings/:path*',
+    // Match auth routes
+    '/sign-in/:path*',
+    '/sign-up/:path*',
   ],
 }
