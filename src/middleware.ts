@@ -12,16 +12,13 @@ const COOKIE_NAME = 'app_session'
 
 async function getSessionFromCookie(request: NextRequest) {
   const cookie = request.cookies.get(COOKIE_NAME)
-  
-  console.log('Middleware - Cookie present:', !!cookie?.value)
-  
+    
   if (!cookie?.value) {
     return null
   }
 
   try {
     const password = process.env.SESSION_PASSWORD
-    console.log('Middleware - SESSION_PASSWORD set:', !!password)
     
     if (!password) {
       console.error('SESSION_PASSWORD is not set')
@@ -31,8 +28,6 @@ async function getSessionFromCookie(request: NextRequest) {
     const session = await unsealData<{ user?: { id: string; email: string } }>(cookie.value, {
       password,
     })
-    
-    console.log('Middleware - Session unsealed, user:', !!session?.user)
     
     return session
   } catch (error) {
@@ -44,13 +39,10 @@ async function getSessionFromCookie(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  console.log('Middleware - pathname:', pathname)
   
   // Check if this is a protected route
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
-  
-  console.log('Middleware - isProtectedRoute:', isProtectedRoute, 'isAuthRoute:', isAuthRoute)
   
   // Skip middleware for non-protected, non-auth routes
   if (!isProtectedRoute && !isAuthRoute) {
@@ -60,8 +52,6 @@ export async function middleware(request: NextRequest) {
   // Get session from cookie
   const session = await getSessionFromCookie(request)
   const isAuthenticated = !!session?.user
-
-  console.log('Middleware - isAuthenticated:', isAuthenticated)
 
   // Redirect unauthenticated users away from protected routes
   if (isProtectedRoute && !isAuthenticated) {
@@ -74,6 +64,16 @@ export async function middleware(request: NextRequest) {
   // Redirect authenticated users away from auth routes
   if (isAuthRoute && isAuthenticated) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // For protected routes, add cache-control headers to prevent browser caching
+  // This helps prevent the back button from showing stale authenticated pages
+  if (isProtectedRoute) {
+    const response = NextResponse.next()
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    return response
   }
 
   return NextResponse.next()

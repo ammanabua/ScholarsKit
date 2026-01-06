@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/providers/AuthProvider'
-import { saveStoredFiles, getStoredFiles } from '@/components/shared/DocumentViewer'
 import { StoredFile } from '@/interfaces/DocumentViewer'
+import { saveStoredFiles, getStoredFiles } from '@/utils/helpers'
 
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL
 

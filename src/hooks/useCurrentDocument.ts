@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getCurrentDocument, setCurrentDocument as setStoredCurrentDocument } from '@/components/shared/DocumentViewer'
 import { StoredFile } from '@/interfaces/DocumentViewer'
+import { getCurrentDocument } from '@/utils/helpers'
 
 interface UseCurrentDocumentResult {
   currentDocument: StoredFile | null
@@ -27,7 +27,7 @@ export function useCurrentDocument(): UseCurrentDocumentResult {
 
   const setCurrentDocument = useCallback((file: StoredFile | null) => {
     setCurrentDocumentState(file)
-    setStoredCurrentDocument(file)
+    setCurrentDocument(file)
   }, [])
 
   return {

@@ -1,7 +1,7 @@
 'use client'
 import AiChat from '@/components/shared/AiChat'
 import DocumentViewer from '@/components/shared/DocumentViewer'
-import { getCurrentDocument } from '@/components/shared/DocumentViewer'
+import { getCurrentDocument } from '@/utils/helpers'
 import { useAuth } from '@/providers/AuthProvider'
 import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'

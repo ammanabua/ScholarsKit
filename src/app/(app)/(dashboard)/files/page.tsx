@@ -1,101 +1,23 @@
 'use client'
 import React, { useState, useRef, DragEvent } from 'react'
-import { FileText, Download, Trash2, Eye, RefreshCw, CloudUpload } from 'lucide-react'
+import { RefreshCw, CloudUpload } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
-import { 
-  deleteStoredFile, 
-  setCurrentDocument,
-  getStoredFiles,
-  saveStoredFiles
-} from '@/components/shared/DocumentViewer'
 import { StoredFile } from '@/interfaces/DocumentViewer'
 import { useUserFiles } from '@/hooks/useUserFiles'
 import { useAuth } from '@/providers/AuthProvider'
+import { formatFileSize, getStoredFiles, saveStoredFiles, setCurrentDocument,  } from '@/utils/helpers'
+import FileCard from '@/components/FileCard'
 
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL
 
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-}
 
-// Format date to "23rd October, 2025; 10:00 AM"
-const formatUploadDate = (dateString: string | undefined): string => {
-  if (!dateString) return 'Unknown'
-  
-  try {
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return dateString
-    
-    const day = date.getDate()
-    const month = date.toLocaleString('en-US', { month: 'long' })
-    const year = date.getFullYear()
-    const time = date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-    
-    // Get ordinal suffix
-    const getOrdinal = (n: number): string => {
-      const s = ['th', 'st', 'nd', 'rd']
-      const v = n % 100
-      return n + (s[(v - 20) % 10] || s[v] || s[0])
-    }
-    
-    return `${getOrdinal(day)} ${month}, ${year}; ${time}`
-  } catch {
-    return dateString
-  }
-}
 
-// Convert any size string or number to MB format
-const formatSizeToMB = (size: string | number | undefined): string => {
-  if (size === undefined || size === null) return 'Unknown'
-  
-  // If it's a number, treat as bytes
-  if (typeof size === 'number') {
-    const mb = size / (1024 * 1024)
-    return mb < 0.01 ? '< 0.01 MB' : mb.toFixed(2) + ' MB'
-  }
-  
-  if (!size || size === 'Unknown') return 'Unknown'
-  
-  // Try to parse the size string
-  const match = String(size).match(/^([\d.]+)\s*(Bytes|KB|MB|GB)$/i)
-  if (!match) return String(size)
-  
-  const value = parseFloat(match[1])
-  const unit = match[2].toUpperCase()
-  
-  let bytes = 0
-  switch (unit) {
-    case 'BYTES':
-      bytes = value
-      break
-    case 'KB':
-      bytes = value * 1024
-      break
-    case 'MB':
-      bytes = value * 1024 * 1024
-      break
-    case 'GB':
-      bytes = value * 1024 * 1024 * 1024
-      break
-    default:
-      return String(size)
-  }
-  
-  // Convert to MB
-  const mb = bytes / (1024 * 1024)
-  return mb < 0.01 ? '< 0.01 MB' : mb.toFixed(2) + ' MB'
-}
 
 const FilesPage = () => {
   const router = useRouter()
   const { user } = useAuth()
   const { files, isLoading: loading, error, refetch } = useUserFiles()
-  const [deleting, setDeleting] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -222,31 +144,6 @@ const FilesPage = () => {
     fileInputRef.current?.click()
   }
 
-  const handleView = (file: StoredFile) => {
-    // Set as current document and navigate to dashboard
-    setCurrentDocument(file)
-    router.push('/dashboard')
-  }
-
-  const handleDownload = (file: StoredFile) => {
-    // Open file URL in new tab for download
-    window.open(file.fileUrl, '_blank')
-  }
-
-  const handleDelete = async (file: StoredFile) => {
-    setDeleting(file.id)
-    try {
-      await deleteStoredFile(file)
-      // Refetch files from server after deletion
-      await refetch()
-      toast.success('File deleted successfully')
-    } catch (error) {
-      toast.error('Failed to delete file: ' + (error instanceof Error ? error.message : 'Unknown error'))
-    } finally {
-      setDeleting(null)
-    }
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -352,54 +249,7 @@ const FilesPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedFiles.map((file) => (
-              <div
-                key={file.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200"
-              >
-                {/* Thumbnail */}
-                <div className="bg-gray-50 h-40 flex items-center justify-center relative overflow-hidden group">
-                  <FileText className="w-12 h-12 text-blue-200" />
-                  
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-black/40 md:bg-black/0 md:group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center gap-3">
-                    <button
-                      onClick={() => handleView(file)}
-                      className="md:opacity-0 md:group-hover:opacity-100 p-2 bg-white rounded-full hover:bg-gray-100 transition-all shadow-md"
-                      title="View file"
-                    >
-                      <Eye className="w-5 h-5 text-blue-600" />
-                    </button>
-                    <button
-                      onClick={() => handleDownload(file)}
-                      className="md:opacity-0 md:group-hover:opacity-100 p-2 bg-white rounded-full hover:bg-gray-100 transition-all shadow-md"
-                      title="Download file"
-                    >
-                      <Download className="w-5 h-5 text-green-600" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* File Info */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 truncate text-sm mb-2" title={file.name}>
-                    {file.name}
-                  </h3>
-                  <div className="text-xs text-gray-500 space-y-1 mb-4">
-                    <p>Size: {formatSizeToMB(file.size)}</p>
-                    <p>Uploaded: {formatUploadDate(file.uploadedAt)}</p>
-                  </div>
-
-                  {/* Delete Button */}
-                  <button
-                    onClick={() => handleDelete(file)}
-                    disabled={deleting === file.id}
-                    className="w-full py-2 px-3 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    {deleting === file.id ? 'Deleting...' : 'Delete'}
-                  </button>
-                </div>
-              </div>
+              <FileCard key={file.id} file={file} />
             ))}
           </div>
         )}

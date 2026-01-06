@@ -4,87 +4,11 @@ import React, { useEffect, useRef, useState, DragEvent } from 'react'
 import GeneralLoader from './GeneralLoader';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/providers/AuthProvider';
-import { StoredFile } from '@/interfaces/DocumentViewer';
+import { setCurrentDocument, getCurrentDocument, getStoredFiles, saveStoredFiles } from '@/utils/helpers';
+import { DocumentViewerProps, StoredFile } from '@/interfaces/DocumentViewer';
 
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
-export const FILES_STORAGE_KEY = 'scholarskit_files';
-export const CURRENT_DOC_KEY = 'scholarskit_current_doc';
 
-
-
-export const getStoredFiles = (): StoredFile[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(FILES_STORAGE_KEY);
-  return stored ? JSON.parse(stored) : [];
-};
-
-export const saveStoredFiles = (files: StoredFile[]) => {
-  localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(files));
-};
-
-// Delete file from localStorage only
-export const deleteStoredFileLocal = (fileId: string) => {
-  const files = getStoredFiles();
-  const updatedFiles = files.filter(f => f.id !== fileId);
-  saveStoredFiles(updatedFiles);
-  // Clear current doc if it was the deleted file
-  const currentDoc = localStorage.getItem(CURRENT_DOC_KEY);
-  if (currentDoc) {
-    const parsed = JSON.parse(currentDoc);
-    if (parsed.id === fileId) {
-      localStorage.removeItem(CURRENT_DOC_KEY);
-    }
-  }
-  return updatedFiles;
-};
-
-// Delete file from backend (S3 and DynamoDB) and localStorage
-export const deleteStoredFile = async (file: StoredFile): Promise<StoredFile[]> => {
-  // Call API Gateway to delete from S3 and DynamoDB
-  if (file.s3Key || file.fileId) {
-    try {
-      const res = await fetch(API_GATEWAY_URL ?? '', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          s3Key: file.s3Key,
-          textS3Key: file.textS3Key,
-          fileId: file.fileId,
-          fileName: file.name,
-        }),
-      });
-      if (!res.ok) {
-        throw new Error('Failed to delete from server');
-      }
-    } catch (error) {
-      console.error('Error deleting from backend:', error);
-      throw error;
-    }
-  }
-  
-  // Delete from localStorage
-  return deleteStoredFileLocal(file.id);
-};
-
-export const setCurrentDocument = (file: StoredFile | null) => {
-  if (file) {
-    localStorage.setItem(CURRENT_DOC_KEY, JSON.stringify(file));
-  } else {
-    localStorage.removeItem(CURRENT_DOC_KEY);
-  }
-};
-
-export const getCurrentDocument = (): StoredFile | null => {
-  if (typeof window === 'undefined') return null;
-  const stored = localStorage.getItem(CURRENT_DOC_KEY);
-  return stored ? JSON.parse(stored) : null;
-};
-
-interface DocumentViewerProps {
-  onDocumentChange?: (hasDocument: boolean) => void;
-}
 
 const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
   const { user } = useAuth();
@@ -125,7 +49,7 @@ const DocumentViewer = ({ onDocumentChange }: DocumentViewerProps = {}) => {
         onDocumentChange?.(false);
         return;
       }
-      setCurrentFileState(savedDoc);
+      setCurrentFile(savedDoc);
       onDocumentChange?.(true);
     }
   }, [onDocumentChange]);

@@ -11,3 +11,6 @@ export interface StoredFile {
   urlCreatedAt?: string; // Timestamp when signed URL was created (for expiration tracking)
 }
 
+export interface DocumentViewerProps {
+  onDocumentChange?: (hasDocument: boolean) => void;
+}
