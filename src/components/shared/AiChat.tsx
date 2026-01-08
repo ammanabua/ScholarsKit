@@ -549,7 +549,7 @@ const AiChat = ({ hasDocument = false, userId, fileId }: AiChatProps) => {
               {isLoading && <span className="text-xs text-gray-500 animate-pulse">Thinking…</span>}
             </div>
 
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
+            <div ref={messagesContainerRef} className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
               {messages.map((message) => (
                 <div
                   key={message.id}
