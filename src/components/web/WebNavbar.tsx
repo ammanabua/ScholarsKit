@@ -5,9 +5,9 @@ import Image from "next/image";
 import { Menu, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const Navbar = () => {
+const WebNavbar = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [navbarScrolled, ] = useState(false);
+    const [navbarScrolled,] = useState(false);
     const router = useRouter();
 
     // Close mobile menu on desktop resize
@@ -118,4 +118,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default WebNavbar
