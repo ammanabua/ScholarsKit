@@ -1,7 +1,7 @@
 # ScholarsKit AI
 
 <div align="center">
-  <img src="public/logo-black.svg" alt="ScholarsKit Logo" width="100"/>
+  <img src="public/logo-white.svg" alt="ScholarsKit Logo" width="100"/>
   <p><strong>Your AI-powered study companion for smarter, faster learning and research</strong></p>
 </div>
 
@@ -26,7 +26,7 @@ ScholarsKit is an intelligent study platform that helps students and researchers
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **State Management**: React Hooks, Context API
@@ -255,7 +255,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👤 Author
 
-**Ammana Bua**
+**Amman Abua**
 - GitHub: [@ammanabua](https://github.com/ammanabua)
 
 ## 🙏 Acknowledgments
@@ -269,5 +269,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 <div align="center">
   <p>Made with ❤️ for students and researchers everywhere</p>
-  <p>© 2026 ScholarsKit. All rights reserved.</p>
+  <p>© 2026 ScholarsKit<sup>&trade;</sup>. All rights reserved.</p>
 </div>
