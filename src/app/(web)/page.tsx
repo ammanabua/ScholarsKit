@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+
 import WebNavbar from "@/components/web/WebNavbar";
 import Hero from "@/components/web/Hero";
 import Features from "@/components/web/Features";
@@ -19,13 +20,11 @@ import WebFooter from "@/components/web/WebFooter";
 
 export default function Page() {
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [, setNavbarScrolled] = useState(false);
 
 
-  // Navbar scroll effect and scroll-to-top visibility
+  // Scroll-to-top visibility
   useEffect(() => {
     const onScroll = () => {
-      setNavbarScrolled(window.scrollY > 20);
       setShowScrollTop(window.scrollY > 300);
     };
     onScroll();

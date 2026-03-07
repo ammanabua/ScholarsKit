@@ -2,13 +2,21 @@
 import { motion } from "framer-motion";
 import { useEffect,useState } from "react";
 import Image from "next/image";
-import { Menu, XIcon } from "lucide-react";
+import { Menu, X as XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const WebNavbar = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [navbarScrolled,] = useState(false);
+    const [navbarScrolled, setNavbarScrolled] = useState(false);
     const router = useRouter();
+
+    // Track scroll for navbar styling
+    useEffect(() => {
+    const onScroll = () => setNavbarScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+    }, []);
 
     // Close mobile menu on desktop resize
     useEffect(() => {
