@@ -11,7 +11,9 @@ const WebFooter = () => {
                 <div className="flex h-10 w-10 items-center justify-center">
                   <Image src='/logo-black.svg' alt="Logo" width={32} height={32} className="h-10 w-10" />
                 </div>
-                <span className="text-xl font-bold">ScholarsKit</span>
+                <span className="text-xl font-semibold">
+                Scholars<span className="bg-violet-600 bg-clip-text text-transparent">Kit</span>
+                </span>
               </div>
               <p className="mb-4 text-sm text-slate-600">Empowering students worldwide with AI-powered learning tools.</p>
               <div className="flex gap-4">

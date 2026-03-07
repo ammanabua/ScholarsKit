@@ -18,7 +18,7 @@ const Testimonials = () => {
                 <Testimonial
                     quote="StudyAI helped me go from a C to an A in Organic Chemistry. The AI explanations are incredibly clear, and the flashcards saved me hours of study time."
                     name="Sarah Chen"
-                    title="Pre-Med Student, UCLA"
+                    title="History and International Relations, UMCP"
                     img="https://static.photos/people/200x200/42"
                 />
                 </Reveal>
@@ -26,7 +26,7 @@ const Testimonials = () => {
                 <Testimonial
                     quote="As a working professional studying for the CFA, time is precious. StudyAI's document analysis feature turned my 500-page textbook into manageable study sessions."
                     name="Marcus Johnson"
-                    title="Financial Analyst, NYC"
+                    title="MBA Candidate, UOTP"
                     img="https://static.photos/people/200x200/88"
                 />
                 </Reveal>
@@ -34,7 +34,7 @@ const Testimonials = () => {
                 <Testimonial
                     quote="The adaptive quizzes are game-changing. It's like having a tutor who knows exactly what I struggle with and focuses on those areas."
                     name="Emily Rodriguez"
-                    title="Computer Science, MIT"
+                    title="Computer Science, MIU"
                     img="https://static.photos/people/200x200/156"
                 />
                 </Reveal>
