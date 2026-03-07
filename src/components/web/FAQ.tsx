@@ -38,7 +38,12 @@ const FAQ = () => {
     
   return (
     <section className="bg-slate-50 py-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
           <Reveal>
             <div className="mb-16 text-center">
               <h2 className="text-3xl font-bold md:text-4xl">Frequently Asked Questions</h2>
@@ -74,7 +79,7 @@ const FAQ = () => {
               );
             })}
           </div>
-        </div>
+        </motion.div>
     </section>
   )
 }

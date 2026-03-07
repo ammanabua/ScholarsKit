@@ -11,7 +11,12 @@ const CTA = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-violet-600" />
         <div className="pointer-events-none absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.14)_1px,transparent_0)] [background-size:24px_24px]" />
 
-        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        <motion.div 
+          className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
           <Reveal>
             <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">Ready to Transform Your Learning?</h2>
             <p className="mx-auto mb-10 max-w-2xl text-xl text-blue-100">
@@ -37,9 +42,9 @@ const CTA = () => {
               </motion.button>
             </div>
 
-            <p className="mt-6 text-sm text-blue-200">No credit card required • 14-day free trial • Cancel anytime</p>
+            <p className="mt-6 text-sm text-blue-200">No credit card required • Free MVP trial • Cancel anytime</p>
           </Reveal>
-        </div>
+        </motion.div>
     </section>
   )
 }

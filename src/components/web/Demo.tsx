@@ -7,7 +7,12 @@ import { motion } from 'framer-motion'
 const Demo = () => {
   return (
     <section className="py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
             <div className="grid items-center gap-12 lg:grid-cols-2">
                 <Reveal className="order-2 lg:order-1">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
@@ -79,19 +84,19 @@ const Demo = () => {
                     </ul>
                 </Reveal>
             </div>
-        </div>
-        <div 
-        className="mx-auto max-w-4xl rounded-3xl bg-blue-600 p-12 text-center text-white shadow-2xl mt-16"
-        style={{
-            animation: 'scaleIn 0.8s ease-out 0.9s both'
-        }}
+        </motion.div>
+        <motion.div 
+          className="mx-auto max-w-4xl rounded-3xl bg-blue-600 p-12 text-center text-white shadow-2xl mt-16"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
         >
             <h2 className="mb-4 text-4xl font-bold">Why ScholarsKit?</h2>
             <p className="text-lg opacity-90">
                 Boost your productivity, deepen your understanding, and make learning enjoyable. 
-                ScholarsKit adapts to your needs, whether you&apos;re preparing for exams or exploring new topics.
+                ScholarsKit adapts to your needs, whether you're preparing for exams or exploring new topics.
             </p>
-        </div>
+        </motion.div>
     </section>
   )
 }

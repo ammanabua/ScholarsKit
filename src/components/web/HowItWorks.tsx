@@ -1,11 +1,17 @@
 'use client'
 import Reveal from './Reveal'
 import StepCard from './StepCard'
+import { motion } from 'framer-motion'
 
 const HowItWorks = () => {
   return (
     <section id="how-it-works" className="scroll-mt-24 bg-gradient-to-b from-slate-50 to-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
           <Reveal>
             <div className="mx-auto mb-16 max-w-3xl text-center">
               <h2 className="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase">How It Works</h2>
@@ -26,7 +32,7 @@ const HowItWorks = () => {
               <StepCard step="3" badgeClass="bg-pink-600 shadow-pink-200" title="Learn & Improve" desc="Study with AI guidance, track your progress, and watch your understanding grow exponentially." />
             </Reveal>
           </div>
-        </div>
+        </motion.div>
     </section>
   )
 }
