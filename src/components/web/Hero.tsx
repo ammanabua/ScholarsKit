@@ -1,3 +1,4 @@
+'use client'
 import { motion } from 'framer-motion';
 import { ArrowRight, Bot, CheckCircle2, PlayCircle, Target, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';

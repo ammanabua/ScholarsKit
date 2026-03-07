@@ -1,4 +1,4 @@
-import React from 'react'
+'use client'
 import Reveal from './Reveal'
 import StepCard from './StepCard'
 

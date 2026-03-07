@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import Reveal from './Reveal'
 import { Check } from 'lucide-react'
@@ -78,6 +79,18 @@ const Demo = () => {
                     </ul>
                 </Reveal>
             </div>
+        </div>
+        <div 
+        className="mx-auto max-w-4xl rounded-3xl bg-blue-600 p-12 text-center text-white shadow-2xl mt-16"
+        style={{
+            animation: 'scaleIn 0.8s ease-out 0.9s both'
+        }}
+        >
+            <h2 className="mb-4 text-4xl font-bold">Why ScholarsKit?</h2>
+            <p className="text-lg opacity-90">
+                Boost your productivity, deepen your understanding, and make learning enjoyable. 
+                ScholarsKit adapts to your needs, whether you&apos;re preparing for exams or exploring new topics.
+            </p>
         </div>
     </section>
   )

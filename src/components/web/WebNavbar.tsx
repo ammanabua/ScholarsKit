@@ -44,7 +44,7 @@ const WebNavbar = () => {
                 <Image src="/logo-black.svg" alt="Logo" width={16} height={16} className="h-10 w-10" />
                 </span>
                 <span className="text-xl font-semibold">
-                Scholars<span className="bg-violet-600 bg-clip-text text-transparent">Kit</span>
+                Scholars<span className="bg-blue-600 bg-clip-text text-transparent">Kit</span>
                 </span>
             </button>
 

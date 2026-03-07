@@ -1,4 +1,4 @@
-import React from 'react'
+'use client'
 import Reveal from './Reveal'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
