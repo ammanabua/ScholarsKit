@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, Bot, Check, CheckCircle2, ChevronDown, Github, Globe, Instagram, Linkedin, Menu, PlayCircle, Star, Target, Twitter, Zap } from "lucide-react";
+import { ArrowRight, Bot, Check, CheckCircle2, ChevronDown, Github, Globe, Instagram, Linkedin, PlayCircle, Star, Target, Twitter, Zap } from "lucide-react";
 
 import StepCard from "@/components/web/StepCard";
+import Navbar from "@/components/web/Navbar";
 
 type Faq = { q: string; a: string };
 
 export default function Page() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [navbarScrolled, setNavbarScrolled] = useState(false);
+  const router = useRouter();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [, setNavbarScrolled] = useState(false);
 
-  const [yearly, setYearly] = useState(false);
-  const proPrice = yearly ? "$115" : "$12";
-  const teamPrice = yearly ? "$279" : "$29";
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -31,16 +30,6 @@ export default function Page() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile menu on desktop resize
-  useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth >= 768) setMobileOpen(false);
-    };
-    window.addEventListener("resize", onResize, { passive: true });
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  const navLinkClass = "text-slate-600 hover:text-blue-600 transition-colors font-medium";
 
   const features = useMemo(
     () => [
@@ -106,94 +95,7 @@ export default function Page() {
 
   return (
     <div className="bg-white text-slate-900">
-      {/* NAV */}
-      <nav
-        className={[
-          "fixed top-0 z-50 w-full border-b backdrop-blur",
-          navbarScrolled ? "bg-white/95 shadow-sm border-slate-200" : "bg-white/80 border-slate-200",
-        ].join(" ")}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="flex items-center gap-2"
-              aria-label="Scroll to top"
-            >
-              <span className="flex h-10 w-10 items-center justify-center">
-                <Image src="/logo-black.svg" alt="Logo" width={16} height={16} className="h-10 w-10" />
-              </span>
-              <span className="text-xl font-bold">
-                ScholarsKit
-              </span>
-            </button>
-
-            {/* Desktop */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className={navLinkClass}>
-                Features
-              </a>
-              <a href="#how-it-works" className={navLinkClass}>
-                How It Works
-              </a>
-              <a href="#testimonials" className={navLinkClass}>
-                Reviews
-              </a>
-              <a href="#pricing" className={navLinkClass}>
-                Pricing
-              </a>
-
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.98 }}
-                className="rounded-full bg-blue-600 px-6 py-2 font-medium text-white shadow-sm hover:bg-blue-700"
-              >
-                Get Started Free
-              </motion.button>
-            </div>
-
-            {/* Mobile */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setMobileOpen((v) => !v)}
-                className="rounded-lg p-2 hover:bg-slate-100"
-                aria-label="Toggle mobile menu"
-              >
-                {mobileOpen ? <XIcon className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        <div className={mobileOpen ? "md:hidden border-t border-slate-200 bg-white" : "hidden"}>
-          <div className="px-4 py-4 space-y-2">
-            {[
-              ["#features", "Features"],
-              ["#how-it-works", "How It Works"],
-              ["#testimonials", "Reviews"],
-              ["#pricing", "Pricing"],
-            ].map(([href, label]) => (
-              <a
-                key={href}
-                href={href}
-                onClick={() => setMobileOpen(false)}
-                className="block rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-100"
-              >
-                {label}
-              </a>
-            ))}
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              className="mt-3 w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
-            >
-              Get Started Free
-            </motion.button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* HERO */}
       <section className="relative overflow-hidden pt-28 pb-20 lg:pb-28">
@@ -231,6 +133,7 @@ export default function Page() {
 
               <div className="mb-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start">
                 <motion.button
+                  onClick={() => router.push('/sign-in')}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.98 }}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-blue-700"
@@ -255,7 +158,7 @@ export default function Page() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  Free forever plan
+                  Free MVP plan
                 </div>
               </div>
             </motion.div>
@@ -552,106 +455,65 @@ export default function Page() {
           <Reveal>
             <div className="mx-auto mb-16 max-w-3xl text-center">
               <h2 className="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase">Pricing</h2>
-              <h3 className="mb-4 text-3xl font-bold md:text-4xl">Simple, Student-Friendly Pricing</h3>
-              <p className="text-lg text-slate-600">Start free, upgrade when you need more power.</p>
-
-              <div className="mt-8 flex items-center justify-center gap-4">
-                <span className={yearly ? "font-medium text-slate-500" : "font-bold text-slate-900"}>Monthly</span>
-
-                <button
-                  onClick={() => setYearly((v) => !v)}
-                  className="relative h-8 w-14 rounded-full bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  aria-label="Toggle billing period"
-                >
-                  <motion.span
-                    layout
-                    className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white"
-                    animate={{ x: yearly ? 24 : 0 }}
-                    transition={{ type: "spring", stiffness: 450, damping: 30 }}
-                  />
-                </button>
-
-                <span className={yearly ? "font-bold text-slate-900" : "font-medium text-slate-500"}>
-                  Yearly <span className="text-sm font-bold text-emerald-600">(Save 20%)</span>
-                </span>
-              </div>
+              <h3 className="mb-4 text-3xl font-bold md:text-4xl">Free for Now, All Features</h3>
+              <p className="text-lg text-slate-600">We&apos;re in MVP mode and providing the complete platform free to all users as we build with our community.</p>
             </div>
           </Reveal>
 
-          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
+          <div className="flex justify-center">
             <Reveal>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8 transition-colors hover:bg-white">
-                <h4 className="mb-2 text-2xl font-bold">Free</h4>
-                <p className="mb-6 text-slate-500">Perfect for trying out</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">$0</span>
-                  <span className="text-slate-500">/month</span>
+              <div className="relative w-full max-w-md overflow-hidden rounded-3xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 p-12 shadow-2xl">
+                <div className="absolute right-0 top-0 rounded-bl-full bg-blue-600 px-6 py-2 text-xs font-bold text-white">MVP LAUNCH</div>
+                
+                <div className="mb-8">
+                  <h4 className="mb-2 text-4xl font-bold text-blue-600">Free</h4>
+                  <p className="text-slate-600">All features included</p>
                 </div>
 
-                <ul className="mb-8 space-y-4">
-                  {["50 AI messages/month", "Basic flashcards", "3 document uploads", "Community support"].map((t) => (
+                <div className="mb-8">
+                  <span className="text-5xl font-bold text-slate-900">$0</span>
+                  <span className="ml-2 text-slate-600">/forever</span>
+                </div>
+
+                <ul className="mb-10 space-y-4">
+                  {[
+                    "Unlimited AI messages",
+                    "Smart flashcards & adaptive quizzes",
+                    "Unlimited document uploads",
+                    "Study planner & progress tracking",
+                    "Multi-language support",
+                    "Study groups & collaboration",
+                    "Full document analysis",
+                  ].map((t) => (
                     <li key={t} className="flex items-center gap-3 text-slate-700">
-                      <Check className="h-5 w-5 text-emerald-600" />
-                      <span>{t}</span>
+                      <Check className="h-6 w-6 text-blue-600 flex-shrink-0" />
+                      <span className="font-medium">{t}</span>
                     </li>
                   ))}
                 </ul>
 
-                <button className="w-full rounded-full border-2 border-slate-300 px-6 py-3 font-semibold text-slate-800 hover:border-blue-400 hover:text-blue-700">
-                  Get Started
-                </button>
-              </div>
-            </Reveal>
+                <motion.button
+                  onClick={() => router.push('/sign-in')}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full rounded-full bg-blue-600 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-blue-700 transition-colors"
+                >
+                  Start Learning Free
+                </motion.button>
 
-            <Reveal>
-              <div className="relative overflow-hidden rounded-2xl border border-blue-500 bg-blue-600 p-8 text-white shadow-xl">
-                <div className="absolute right-0 top-0 rounded-bl-lg bg-pink-500 px-4 py-1 text-xs font-bold">POPULAR</div>
-                <h4 className="mb-2 text-2xl font-bold">Pro</h4>
-                <p className="mb-6 text-blue-100">For serious students</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">{proPrice}</span>
-                  <span className="text-blue-100">/month</span>
-                </div>
-
-                <ul className="mb-8 space-y-4">
-                  {["Unlimited AI messages", "Advanced flashcards & quizzes", "Unlimited document uploads", "Study planner & analytics", "Priority support"].map((t) => (
-                    <li key={t} className="flex items-center gap-3">
-                      <Check className="h-5 w-5 text-blue-100" />
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button className="w-full rounded-full bg-white px-6 py-3 font-semibold text-blue-700 hover:bg-blue-50">
-                  Start Pro Trial
-                </button>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8 transition-colors hover:bg-white">
-                <h4 className="mb-2 text-2xl font-bold">Study Group</h4>
-                <p className="mb-6 text-slate-500">Collaborate with friends</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">{teamPrice}</span>
-                  <span className="text-slate-500">/month</span>
-                </div>
-
-                <ul className="mb-8 space-y-4">
-                  {["Everything in Pro", "Up to 5 members", "Shared study materials", "Group progress tracking", "Admin controls"].map((t) => (
-                    <li key={t} className="flex items-center gap-3 text-slate-700">
-                      <Check className="h-5 w-5 text-emerald-600" />
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button className="w-full rounded-full border-2 border-slate-300 px-6 py-3 font-semibold text-slate-800 hover:border-blue-400 hover:text-blue-700">
-                  Start Group Plan
-                </button>
+                <p className="mt-6 text-center text-xs text-slate-600">No credit card required • No hidden fees • Cancel anytime</p>
               </div>
             </Reveal>
           </div>
+
+          <Reveal>
+            <div className="mt-16 rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
+              <h3 className="mb-4 text-2xl font-bold text-slate-900">Why Free for Now?</h3>
+              <p className="mx-auto max-w-2xl text-lg text-slate-600">
+                We believe everyone should have access to world-class AI learning tools. Our mission is to democratize education, and that starts with providing full platform access to all users from day one. As we grow and improve, our pricing may evolve, but we&apos;re committed to keeping core features accessible.
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -710,6 +572,7 @@ export default function Page() {
 
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <motion.button
+                onClick={() => router.push('/sign-in')}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.98 }}
                 className="rounded-full bg-white px-8 py-4 text-lg font-bold text-blue-700 shadow-sm hover:bg-blue-50"

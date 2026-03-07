@@ -3,7 +3,7 @@ import AiChat from '@/components/shared/AiChat'
 import DocumentViewer from '@/components/shared/DocumentViewer'
 import { getCurrentDocument } from '@/utils/helpers'
 import { useAuth } from '@/providers/AuthProvider'
-import { Suspense, useEffect, useState, useCallback } from 'react'
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 
@@ -13,6 +13,7 @@ function DashboardContent() {
   const { user } = useAuth()
   const [hasDocument, setHasDocument] = useState(false)
   const [currentFileId, setCurrentFileId] = useState<string | undefined>(undefined)
+  const toastShownRef = useRef(false)
 
   // Check for existing document on mount
   useEffect(() => {
@@ -30,7 +31,8 @@ function DashboardContent() {
 
   useEffect(() => {
     const loginSuccess = searchParams.get('login') === 'success'
-    if (loginSuccess) {
+    if (loginSuccess && !toastShownRef.current) {
+      toastShownRef.current = true
       toast.success('Signed in successfully!')
       // Clean the URL to remove the query flag
       router.replace('/dashboard')
