@@ -1,3 +1,4 @@
+'use client'
 import { StoredFile } from "@/interfaces/DocumentViewer"
 import { deleteStoredFile, setCurrentDocument } from "@/utils/helpers"
 import { formatSizeToMB, formatUploadDate } from "@/utils/helpers"
