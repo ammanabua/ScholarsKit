@@ -86,15 +86,15 @@ const Demo = () => {
             </div>
         </motion.div>
         <motion.div 
-          className="mx-auto max-w-4xl rounded-3xl bg-blue-600 p-12 text-center text-white shadow-2xl mt-16"
+          className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-br from-blue-600 via-blue-600 to-violet-600 p-16 text-center text-white shadow-2xl mt-16 border border-blue-400/20"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
         >
-            <h2 className="mb-4 text-4xl font-bold">Why ScholarsKit?</h2>
-            <p className="text-lg opacity-90">
+            <h2 className="mb-4 text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">Why ScholarsKit?</h2>
+            <p className="text-xl opacity-95 leading-relaxed">
                 Boost your productivity, deepen your understanding, and make learning enjoyable. 
-                ScholarsKit adapts to your needs, whether you're preparing for exams or exploring new topics.
+                ScholarsKit adapts to your needs, whether you&apos;re preparing for exams or exploring new topics.
             </p>
         </motion.div>
     </section>
