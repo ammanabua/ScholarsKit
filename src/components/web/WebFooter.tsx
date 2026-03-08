@@ -18,24 +18,24 @@ const WebFooter = () => {
               </div>
               <p className="mb-4 text-sm text-slate-600">Empowering students worldwide with AI-powered learning tools.</p>
               <div className="flex gap-4">
-                <a href="#" className="text-slate-500 hover:text-slate-900" aria-label="Twitter">
+                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="Follow us on X">
                   <Twitter className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-slate-500 hover:text-slate-900" aria-label="GitHub">
+                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="GitHub">
                   <Github className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-slate-500 hover:text-slate-900" aria-label="LinkedIn">
+                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="LinkedIn">
                   <Linkedin className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-slate-500 hover:text-slate-900" aria-label="Instagram">
+                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="Instagram">
                   <Instagram className="h-5 w-5" />
                 </a>
               </div>
             </div>
 
-            <FooterCol title="Product" links={[["Features", "#features"], ["Pricing", "#pricing"], ["API", "#"], ["Integrations", "#"]]} />
-            <FooterCol title="Resources" links={[["Documentation", "#"], ["Help Center", "#"], ["Community", "#"], ["Blog", "#"]]} />
-            <FooterCol title="Company" links={[["About", "#"], ["Careers", "#"], ["Privacy", "#"], ["Terms", "#"]]} />
+            <FooterCol title="Product" links={[["Features", "#features"], ["Pricing", "#pricing"], ["API", "/"], ["Integrations", "/"]]} />
+            <FooterCol title="Resources" links={[["Documentation", "/"], ["Help Center", "/"], ["Community", "/"], ["Blog", "/"]]} />
+            <FooterCol title="Company" links={[["About", "/"], ["Careers", "/"], ["Privacy", "/"], ["Terms", "/"]]} />
           </div>
 
           <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
