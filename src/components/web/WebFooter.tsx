@@ -1,6 +1,7 @@
 'use client'
 import { Twitter, Github, Linkedin, Instagram, Globe } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const WebFooter = () => {
   return (
@@ -18,18 +19,18 @@ const WebFooter = () => {
               </div>
               <p className="mb-4 text-sm text-slate-600">Empowering students worldwide with AI-powered learning tools.</p>
               <div className="flex gap-4">
-                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="Follow us on X">
+                <Link href="/" className="text-slate-500 hover:text-slate-900" aria-label="Follow us on X">
                   <Twitter className="h-5 w-5" />
-                </a>
-                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="GitHub">
+                </Link>
+                <Link href="/" className="text-slate-500 hover:text-slate-900" aria-label="GitHub">
                   <Github className="h-5 w-5" />
-                </a>
-                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="LinkedIn">
+                </Link>
+                <Link href="/" className="text-slate-500 hover:text-slate-900" aria-label="LinkedIn">
                   <Linkedin className="h-5 w-5" />
-                </a>
-                <a href="/" className="text-slate-500 hover:text-slate-900" aria-label="Instagram">
+                </Link>
+                <Link href="/" className="text-slate-500 hover:text-slate-900" aria-label="Instagram">
                   <Instagram className="h-5 w-5" />
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -59,9 +60,9 @@ function FooterCol({ title, links }: { title: string; links: Array<[string, stri
       <ul className="space-y-2 text-sm">
         {links.map(([label, href]) => (
           <li key={label}>
-            <a href={href} className="text-slate-600 hover:text-slate-900 transition-colors">
+            <Link href={href} className="text-slate-600 hover:text-slate-900 transition-colors">
               {label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
