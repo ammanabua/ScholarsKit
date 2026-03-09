@@ -36,7 +36,7 @@ const Pricing = () => {
 
                         <div className="mb-8">
                             <span className="text-5xl font-bold text-slate-900">$0</span>
-                            <span className="ml-2 text-slate-600">/forever</span>
+                            <span className="ml-2 text-slate-600">/MVP Plan</span>
                         </div>
 
                         <ul className="mb-10 space-y-4">
