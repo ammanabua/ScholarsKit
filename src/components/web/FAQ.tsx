@@ -24,8 +24,8 @@ const FAQ = () => {
             a: "Absolutely. We use enterprise-grade encryption and never share your personal data or study materials with third parties. You can delete your data at any time.",
           },
           {
-            q: "What subjects does StudyAI support?",
-            a: "StudyAI supports virtually all subjects: Math, Sciences, Computer Science, History, Literature, Economics, Medicine, Law, and Languages.",
+            q: "What subjects does ScholarsKit support?",
+            a: "ScholarsKit supports virtually all subjects: Math, Sciences, Computer Science, History, Literature, Economics, Medicine, Law, and Languages.",
           },
           {
             q: "Can I cancel my subscription anytime?",
