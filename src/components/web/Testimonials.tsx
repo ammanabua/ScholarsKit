@@ -23,7 +23,7 @@ const Testimonials = () => {
         <div className="grid gap-8 md:grid-cols-3">
           <Reveal>
             <Testimonial
-              quote="StudyAI helped me go from a C to an A in Organic Chemistry. The AI explanations are incredibly clear, and the flashcards saved me hours of study time."
+              quote="ScholarsKit AI helped me go from a C to an A in Organic Chemistry. The AI explanations are incredibly clear, and the flashcards saved me hours of study time."
               name="Sarah Chen"
               title="History and International Relations, UMCP"
               img="https://static.photos/people/200x200/42"
@@ -31,7 +31,7 @@ const Testimonials = () => {
           </Reveal>
           <Reveal>
             <Testimonial
-              quote="As a working professional studying for the CFA, time is precious. StudyAI's document analysis feature turned my 500-page textbook into manageable study sessions."
+              quote="As a working professional studying for the CFA, time is precious. ScholarsKit AI's document analysis feature turned my 500-page textbook into manageable study sessions."
               name="Marcus Johnson"
               title="MBA Candidate, UOTP"
               img="https://static.photos/people/200x200/88"
